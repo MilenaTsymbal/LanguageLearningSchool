@@ -1,0 +1,88 @@
+@using LanguageLearningSchool.ViewModels;
+
+@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+<link rel="stylesheet" href="/css/RegisterPage.css" />
+<main>
+        <div class="Register-form">
+            <div class="Register-container">
+                @*<@*div class="row g-5">*@
+                <div class="col-md-7 col-lg-8">
+                    <form method="post" asp-action="Register" enctype="multipart/form-data" class="form">
+                        <div class="row g-3">
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="Name" class="form-label">First name</label>
+                                    <input asp-for="Name" type="text" class="form-control"
+                                       required>
+                                    <span asp-validation-for="Name" class="highlight"></span>
+                                    <label class="register-lable">Write your First name</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                <label asp-for="MiddleName" class="form-label">Middle name</label>
+                                    <input asp-for="MiddleName" type="text" class="form-control"
+                                       required>
+                                    <span asp-validation-for="MiddleName" class="highlight"></span>
+                                    <label class="register-lable">Write your Middle name</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="Surname" class="form-label">Last name</label>
+                                    <input asp-for="Surname" type="text" class="form-control"
+                                       required>
+                                    <span asp-validation-for="Surname" class="highlight"></span>
+                                    <label class="register-lable">Write your Last name</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="PhoneNumber" class="form-label">Phone number</label>
+                                    <input asp-for="PhoneNumber" type="number"
+                                       class="form-control" required>
+                                    <span asp-validation-for="PhoneNumber" class="highlight"></span>
+                                    <label class="register-lable">Write an phone number</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="Email" class="form-label">Email</label>
+                                    <input asp-for="Email" class="form-control" required>
+                                    <span asp-validation-for="Email" class="highlight"></span>
+                                    <label class="register-lable">Write an Email</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="Password" class="form-label">Password</label>
+                                    <input asp-for="Password" type="password" class="form-control"
+                                       required>
+                                    <span asp-validation-for="Password" class="highlight"></span>
+                                    <label class="register-lable">Write an Password</label>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="col-12">
+                                    <label asp-for="ConfirmPassword" class="form-label">Password confirm</label>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control"
+                                       required>
+                                    <span asp-validation-for="ConfirmPassword" class="highlight"></span>
+                                    <label class="register-lable">Confirm password</label>
+                                </div>
+
+
+                                <button class="w-100 btn btn-primary btn-lg" type="submit">Sign up</button>
+                            </div>
+                    </form>
+                </div>
+                @*  </div>*@
+            </div>
+        </div>
+    </main>

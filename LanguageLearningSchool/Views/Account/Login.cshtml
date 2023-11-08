@@ -1,0 +1,40 @@
+@using LanguageLearningSchool.ViewModels;
+
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+<link href="~/css/LoginPage.css" rel="stylesheet" />
+<main class="login-back">
+    <section class="login-form">
+        <div class="login-container">
+            @*<div class="row g-5">*@
+            <div class="col-md-7 col-lg-8">
+                <form method="post" asp-controller="Account" asp-action="Login" enctype="multipart/form-data" class="form">
+                    <div class="form-body">
+                        <h1 id="myElement" class="form-title"> Log in </h1>
+                        <div class="group">
+                            @*<label asp-for="Email" class="form-label">Email</label>*@
+                            <input asp-for="Email" type="email" class="form-control" required>
+                            <span asp-validation-for="Email" class="highlight"></span>
+                            <label class="login-lable">Write an email</label>
+                            @*<span class="bar"></span>*@
+                        </div>
+
+                        <div class="group">
+                            @*<label asp-for="Password" class="form-label">Password</label>*@
+                            <input asp-for="Password" type="password" class="form-control"  required>
+                            <span asp-validation-for="Password" class="highlight"></span>
+                            @*<span class="bar"></span>*@
+                            <label class="login-lable">Write an Password</label>
+                        </div>
+
+                        <button class="w-100 btn btn-primary btn-lg" type="submit">Log in</button>
+                    </div>
+                </form>
+            </div>
+            @*</div>*@
+        </div>
+    </section>
+</main>
