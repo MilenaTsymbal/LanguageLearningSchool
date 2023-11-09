@@ -4,8 +4,8 @@ namespace LanguageLearningSchool.Interfaces
 {
     public interface ICourseRepository
     {
-        Task<IEnumerable<Course>> GetAll();
-        Task<Course> GetByIdAsync(int id);
+        List<Course> GetAll();
+        Course GetById(int id);
         bool Add(Course course);
         bool Delete(Course course);
         bool Update(Course course);

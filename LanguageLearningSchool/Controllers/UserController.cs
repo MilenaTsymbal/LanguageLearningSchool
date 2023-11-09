@@ -14,9 +14,9 @@ namespace LanguageLearningSchool.Controllers
         }
         public readonly IUserRepository _userRepository;
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            IEnumerable<User> users = await _userRepository.GetAll();
+            List<User> users = _userRepository.GetAll();
             return View(users);
         }
     }

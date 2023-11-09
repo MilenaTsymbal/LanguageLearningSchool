@@ -5,13 +5,11 @@
         English,
         Spanish,
         French,
-        Gernman,
+        German,
         Chinese,
         Japanese,
-        Arabic,
         Italian,
         Portuguese,
-        Korean,
-        Turkish
+        Korean
     }
 }

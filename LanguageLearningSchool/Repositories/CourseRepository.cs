@@ -27,14 +27,14 @@ namespace LanguageLearningSchool.Repositories
             return Save();
         }
 
-        public async Task<IEnumerable<Course>> GetAll()
+        public List<Course> GetAll()
         {
-            return await _context.Courses.ToListAsync();
+            return _context.Courses.ToList();
         }
 
-        public async Task<Course> GetByIdAsync(int id)
+        public Course GetById(int id)
         {
-            return await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == id);
+            return _context.Courses.FirstOrDefault(c => c.CourseId == id);
         }
         
         public bool Save()

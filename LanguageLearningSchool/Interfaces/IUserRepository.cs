@@ -4,8 +4,8 @@ namespace LanguageLearningSchool.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAll();
-        Task<User> GetByIdAsync(int id);
+        List<User> GetAll();
+        User GetByIdAsync(int id);
         bool Add(User user);
         bool Delete(User user);
         bool Update(User user);

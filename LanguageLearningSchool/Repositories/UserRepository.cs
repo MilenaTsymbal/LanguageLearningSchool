@@ -14,15 +14,15 @@ namespace LanguageLearningSchool.Repositories
 
         private readonly ApplicationDbContext _context;
 
-        public async Task<IEnumerable<User>> GetAll()
+        public List<User> GetAll()
         {
-            return await _context.Users.ToListAsync();
+            return _context.Users.ToList();
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public User? GetByIdAsync(int id)
         {
             string idAsString = id.ToString();
-            return await _context.Users.FirstOrDefaultAsync(c => c.Id == idAsString);
+            return _context.Users.FirstOrDefault(c => c.Id == idAsString);
         }
 
         public bool Add(User user)

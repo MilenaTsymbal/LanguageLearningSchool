@@ -3,6 +3,7 @@ using LanguageLearningSchool.Models;
 using LanguageLearningSchool.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LanguageLearningSchool.Controllers;
 
@@ -37,7 +38,7 @@ public class AccountController : Controller
             return View(loginViewModel);
         }
 
-        var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+        var user = await _userManager.FindByNameAsync(loginViewModel.Email);
 
         if (user != null)
         {

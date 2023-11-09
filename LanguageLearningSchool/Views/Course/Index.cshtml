@@ -1,5 +1,19 @@
-﻿@model IEnumerable<Course>
-
+﻿@using LanguageLearningSchool.Enums;
+@model List<Course>
+@{
+    var LanguageColour = new Dictionary<Languages, string>
+    {
+        {Languages.English, "#FED6BC"},
+        {Languages.Spanish, "#FFFADD"},
+        {Languages.French, "#DEF7FE"},
+        {Languages.German, "#E7ECFF"},
+        {Languages.Chinese, "#C3FBD8"},
+        {Languages.Japanese, "#FDEED9"},
+        {Languages.Italian, "#F6FFF8"},
+        {Languages.Portuguese, "#B5F2EA"},
+        {Languages.Korean, "#C6D8FF"},
+    };
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,11 +32,12 @@
                 <div class="row">
                 @foreach(var item in Model)
                 {
+                        var currentColour = LanguageColour[item.Language];
                                 <div class="col-md-4">
                                     <div class="card mb-4 box-shadow">
                                         <div class="card-img-top"
                                             data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
-                                            style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: #f5e9ae;"
+                                                style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: @currentColour"
                                             data-holder-rendered="true">
                                             <h5>@item.CourseName</h5>
                                         </div>
