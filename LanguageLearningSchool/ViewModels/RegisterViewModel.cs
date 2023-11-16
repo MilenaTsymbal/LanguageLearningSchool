@@ -1,3 +1,4 @@
+using LanguageLearningSchool.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace LanguageLearningSchool.ViewModels;
@@ -20,6 +21,10 @@ public class RegisterViewModel
     [Display(Name = "Phone number")]
     [DataType(DataType.PhoneNumber)]
     public string PhoneNumber { get; set; }
+
+    [Required(ErrorMessage = "Role is required")]
+    [Display(Name = "Role")]
+    public Roles UserRole { get; set; }
 
     [Required(ErrorMessage = "Email is required")]
     [Display(Name = "Email address")]

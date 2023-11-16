@@ -1,6 +1,11 @@
 ﻿@using LanguageLearningSchool.Enums;
-@model List<Course>
+@using LanguageLearningSchool.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> UserManager
+@model CourseIndexViewModel
 @{
+    var currentUser = await UserManager.GetUserAsync(User); 
+
     var LanguageColour = new Dictionary<Languages, string>
     {
         {Languages.English, "#FED6BC"},
@@ -29,32 +34,53 @@
     <main>
         <div class="album py-5">
             <div class="container">
-                <div class="row">
-                @foreach(var item in Model)
+                @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()) 
+                    || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
                 {
+                    <div style="float:right; width: 40px; font-size: 14px">
+                        <a asp-controller="Course" asp-action="Create" type="button" class="btn btn-secondary btn-sm" >+</a>
+                    </div>
+                }
+                
+                <div class="row">
+                    @foreach(var item in Model.Courses)
+                    {
                         var currentColour = LanguageColour[item.Language];
-                                <div class="col-md-4">
-                                    <div class="card mb-4 box-shadow">
-                                        <div class="card-img-top"
-                                            data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
-                                                style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: @currentColour"
-                                            data-holder-rendered="true">
-                                            <h5>@item.CourseName</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="card-text">@item.Description</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="btn-group">
-                                                    <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" type="button" class="btn btn-sm btn-outline-secondary">View</a>
-                                                    <a type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                                </div>
-                                            </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4 box-shadow">
+                                <div class="card-img-top"
+                                    data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
+                                        style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: 
+                                            center; background-color: @currentColour"
+                                    data-holder-rendered="true">
+                                        <h5>@item.CourseName</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">@item.Description</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
+                                                type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                                            @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()) 
+                                                || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
+                                            {
+                                                bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId 
+                                                    && uc.StartDate != null);
+                                                if (!isUserRegistered)
+                                                {
+                                                    <form method="post" asp-controller="Course" asp-action="AddUserToCourse" asp-route-courseId="@item.CourseId">
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
+                                                    </form>
+                                                }
+                                            }
+                                            
                                         </div>
                                     </div>
                                 </div>
-                           
-                }
-                 </div>
+                            </div>
+                        </div>
+                    }
+            </div>
          </div>
        </div>
     </main>

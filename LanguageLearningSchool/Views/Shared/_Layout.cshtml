@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,29 +37,24 @@
                         
                     </ul>
                     <ul class="navbar-nav">
-                        @if (SignInManager.IsSignedIn(User))
+                        @if (!SignInManager.IsSignedIn(User))
                         {
-                                <li class="nav-item-button">
-                                    <form asp-area="" asp-controller="Account" asp-action="LogOut" method="get">
-                                        <button type="submit" class="nav-link-but nav-link-but-log">Log out</button>
-                                    </form>
-                                </li>
-                        }
-                        else
-                        {
-                                <li class="nav-item-button">
-                                    <form asp-area="" asp-controller="Account" asp-action="Login" method="get">
-                                        <button type="submit" class="nav-link-but home-btn">Log in</button>
-                                    </form>
-                                </li>
-                                <li class="nav-item-button">
-                                    <form asp-area="" asp-controller="Account" asp-action="Register" method="get">
-                                        <button type="submit" class="nav-link-but home-btn">Register</button>
-                                    </form>
-                                </li>
+                            <a type="submit" asp-area="" asp-controller="Account" asp-action="Login" method="get"
+                                    class="btn btn-sm btn-outline-secondary" style="width: 70px; margin-right: 10px;">Log in</a>
+                            <a type="submit" asp-area="" asp-controller="Account" asp-action="Register" method="get"
+                                    class="btn btn-sm btn-outline-secondary" style="width: 70px;">Register</a>
+                                
                         }
                     </ul>
-
+                    <ul class="navbar-nav">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" 
+                                asp-action="UserDetail">@User.Identity.Name</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>

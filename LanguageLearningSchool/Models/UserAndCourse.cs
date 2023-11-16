@@ -18,6 +18,6 @@ namespace LanguageLearningSchool.Models
 
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public int GeneralEstimation { get; set; }
+        public int? GeneralEstimation { get; set; }
     }
 }

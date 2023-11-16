@@ -1,3 +1,4 @@
+@using LanguageLearningSchool.Enums;
 @using LanguageLearningSchool.ViewModels;
 
 @model RegisterViewModel
@@ -21,7 +22,6 @@
                                     <input asp-for="Name" type="text" class="form-control"
                                        required>
                                     <span asp-validation-for="Name" class="highlight"></span>
-                                    <label class="register-lable">Write your First name</label>
                                 </div>
                             </div>
                             <div class="group">
@@ -30,7 +30,6 @@
                                     <input asp-for="MiddleName" type="text" class="form-control"
                                        required>
                                     <span asp-validation-for="MiddleName" class="highlight"></span>
-                                    <label class="register-lable">Write your Middle name</label>
                                 </div>
                             </div>
                             <div class="group">
@@ -39,24 +38,28 @@
                                     <input asp-for="Surname" type="text" class="form-control"
                                        required>
                                     <span asp-validation-for="Surname" class="highlight"></span>
-                                    <label class="register-lable">Write your Last name</label>
                                 </div>
                             </div>
                             <div class="group">
                                 <div class="col-12">
                                     <label asp-for="PhoneNumber" class="form-label">Phone number</label>
-                                    <input asp-for="PhoneNumber" type="number"
+                                    <input asp-for="PhoneNumber" type="tel"
                                        class="form-control" required>
                                     <span asp-validation-for="PhoneNumber" class="highlight"></span>
-                                    <label class="register-lable">Write an phone number</label>
                                 </div>
+                            </div>
+                            <div class="group">
+                                <label asp-for="UserRole">Choose your role</label>
+                                <select class="form-select" asp-for="UserRole" asp-items="@Html.GetEnumSelectList<Roles>()">
+                                    <option>--Select--</option>
+                                </select>
+                                <span asp-validation-for="UserRole" class="text-danger"></span>
                             </div>
                             <div class="group">
                                 <div class="col-12">
                                     <label asp-for="Email" class="form-label">Email</label>
                                     <input asp-for="Email" class="form-control" required>
                                     <span asp-validation-for="Email" class="highlight"></span>
-                                    <label class="register-lable">Write an Email</label>
                                 </div>
                             </div>
                             <div class="group">
@@ -65,7 +68,6 @@
                                     <input asp-for="Password" type="password" class="form-control"
                                        required>
                                     <span asp-validation-for="Password" class="highlight"></span>
-                                    <label class="register-lable">Write an Password</label>
                                 </div>
                             </div>
                             <div class="group">
@@ -74,11 +76,10 @@
                                     <input asp-for="ConfirmPassword" type="password" class="form-control"
                                        required>
                                     <span asp-validation-for="ConfirmPassword" class="highlight"></span>
-                                    <label class="register-lable">Confirm password</label>
                                 </div>
 
 
-                                <button class="w-100 btn btn-primary btn-lg" type="submit">Sign up</button>
+                                <button class="btn btn-sm btn-outline-secondary" type="submit" style="margin-top: 10px;">Sign up</button>
                             </div>
                     </form>
                 </div>

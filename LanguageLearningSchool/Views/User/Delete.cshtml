@@ -1,0 +1,11 @@
+﻿@model User
+
+<h5>Are you sure that you want to delete your account?</h5>
+<div class="form-group">
+    <form method="post" asp-controller="User" asp-action="Delete">
+        <div class="btn-group">
+            <input type="submit" value="Confirm" class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;"/>
+            <a class="btn btn-sm btn-outline-secondary" asp-controller="User" asp-action="UserDetail">Cancel</a>
+        </div>
+    </form>
+</div>

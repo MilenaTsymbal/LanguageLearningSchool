@@ -1,0 +1,44 @@
+﻿@using LanguageLearningSchool.Enums;
+@using LanguageLearningSchool.ViewModels;
+@model EditUserViewModel
+
+<form method="post" asp-action="Edit">
+        <input asp-for="Id" type="hidden" class="form-control">
+        <div class="form-group">
+            <label asp-for="Name">Name</label>
+            <input asp-for="Name" type="text" class="form-control" placeholder="Enter name">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MiddleName">Middle name</label>
+            <input asp-for="MiddleName" type="text" class="form-control" id="exampleInputDescription"
+                placeholder="Enter middle name">
+            <span asp-validation-for="MiddleName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Surname">Surname</label>
+            <input asp-for="Surname" type="text" class="form-control" id="exampleInputDescription"
+                placeholder="Enter surname">
+            <span asp-validation-for="Surname" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="PhoneNumber">Phone number</label>
+            <input asp-for="PhoneNumber" type="text" class="form-control" id="exampleInputDescription"
+                placeholder="Enter phone number">
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email">Email</label>
+            <input asp-for="Email" type="text" class="form-control" id="exampleInputDescription"
+                placeholder="Enter email">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="UserRole">Role</label>
+            <select class="form-select" asp-for="UserRole" asp-items="@Html.GetEnumSelectList<Roles>()">
+                <option>--Select--</option>
+            </select>
+            <span asp-validation-for="UserRole" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 15px">Submit changes</button>
+</form>

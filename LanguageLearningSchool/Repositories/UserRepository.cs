@@ -19,10 +19,9 @@ namespace LanguageLearningSchool.Repositories
             return _context.Users.ToList();
         }
 
-        public User? GetByIdAsync(int id)
+        public User? GetById(string id)
         {
-            string idAsString = id.ToString();
-            return _context.Users.FirstOrDefault(c => c.Id == idAsString);
+            return _context.Users.FirstOrDefault(c => c.Id == id);
         }
 
         public bool Add(User user)

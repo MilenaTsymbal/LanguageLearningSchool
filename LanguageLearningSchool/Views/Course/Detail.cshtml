@@ -1,164 +1,184 @@
-﻿@using LanguageLearningSchool.ViewModels;
+﻿@using LanguageLearningSchool.Enums;
+@using LanguageLearningSchool.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
 @model CourseDetailsViewModel
+@{
+var currentUser = await UserManager.GetUserAsync(User);
+var LanguageColour = new Dictionary<Languages, string>
+    {
+    {Languages.English, "#FED6BC"},
+    {Languages.Spanish, "#FFFADD"},
+    {Languages.French, "#DEF7FE"},
+    {Languages.German, "#E7ECFF"},
+    {Languages.Chinese, "#C3FBD8"},
+    {Languages.Japanese, "#FDEED9"},
+    {Languages.Italian, "#F6FFF8"},
+    {Languages.Portuguese, "#B5F2EA"},
+    {Languages.Korean, "#C6D8FF"},
+    };
 
-<p>@Model.Course.CourseName</p>
-<p>@Model.Course.Description</p>
-<p>@Model.Course.Language</p>
-<p>@Model.Course.DifficultyLevel</p>
-
-@foreach(var user in Model.Users)
-{
-        <p>@user.Name</p>
-        <p>@user.Name</p>
+    var currentColour = LanguageColour[Model.Course.Language];
 }
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body{margin-top:20px;}
+    .courseDetail {
+        width: 100%;
+        align-items: stretch;
+    }
 
+    .courseBackgroundColour {
+        width: 100%;
+        height: 150px;
+    }
 
-#main {
-    background-color: #f2f2f2;
-    padding: 20px;
-    margin-top: -55px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    -o-border-radius: 4px;
-    border-radius: 4px;
-    border-bottom: 4px solid #ddd;
-}
+    .courseInfo {
+        display: flex;
+        width: 100%;
+    }
 
+    .courseFullInfo {
+        width: 70%;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
 
-#real-estates-detail #author img {
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    -ms-border-radius: 100%;
-    -o-border-radius: 100%;
-    border-radius: 100%;
-    border: 5px solid #ecf0f1;
-    margin-bottom: 10px;
-}
+    .courseExtraInfo {
+        width: 30%;
+    }
 
-#real-estates-detail .sosmed-author i.fa {
-    width: 30px;
-    height: 30px;
-    border: 2px solid #bdc3c7;
-    color: #bdc3c7;
-    padding-top: 6px;
-    margin-top: 10px;
-}
+    .courseButtons {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
 
-.panel-default .panel-heading {
-    background-color: #fff;
-}
+    .courseButtons a {
+        margin-top: 10px;
+        width: 140px;
+    }
 
-#real-estates-detail .slides li img {
-    height: 450px;
-}
+    .courseUsers {
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    .user {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 30px;
+        width: 100%;
+    }
 </style>
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-<div id="main" class="container">
-    <div class="row">
-        <div class="col-lg-12">
-            <h2 class="page-header">
-                Real Estates Detail
-            </h2>
-        </div>
-    </div>
+</head>
 
-    <!-- start:real estates detail -->
-    <div class="row" id="real-estates-detail">
-        <div class="col-lg-4 col-md-4 col-xs-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <header class="panel-title">
-                        <div class="text-center">
-                            <strong>Agent</strong> Author<strong>.</strong>
-                        </div>
-                    </header>
-                </div>
-                <div class="panel-body">
-                    <div class="text-center" id="author">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar1.png">
-                        <h3>John Doe</h3>
-                        <small class="label label-warning">From USA</small>
-                        <p>Aku kie sing sok ngedolke omah-omah kae, yo iso di omongke makelar ngono sih. Tapi makelar nek payu ne akeh yo dadi sugih bro. Tenanan ra ngapusi.</p>
-                        <p class="sosmed-author">
-                            <a href="#"><i class="fa fa-facebook" title="Facebook"></i></a>
-                            <a href="#"><i class="fa fa-twitter" title="Twitter"></i></a>
-                            <a href="#"><i class="fa fa-google-plus" title="Google Plus"></i></a>
-                            <a href="#"><i class="fa fa-linkedin" title="Linkedin"></i></a>
-                        </p>
-                    </div>
-                </div>
-            </div>
+<body>
+<div class="container">
+    <div class="courseDetail">
+        <div class="courseBackgroundColour"
+            style="display: flex; justify-content: center; align-items: center; background-color: @currentColour;">
+            <h5>@Model.Course.CourseName</h5>
         </div>
-        <div class="col-lg-8 col-md-8 col-xs-12">
-            <div class="panel">
-                <div class="panel-body">
-                    <ul id="myTab" class="nav nav-pills">
-                        <li class="active"><a href="#photos" data-toggle="tab">Photos</a></li>
-                        <li class=""><a href="#detail" data-toggle="tab">Detail</a></li>
-                        <li class=""><a href="#contact" data-toggle="tab">Contact</a></li>
-                    </ul>
-                    <div id="myTabContent" class="tab-content">
-                        <div class="tab-pane fade active in" id="photos">
-                            <br>
-                            <div class="flexslider">    
-                                <img class="img-responsive" src="https://www.bootdey.com/image/900x400/FFB6C1/000000" draggable="false">
-                            </div>
+        <div class="courseInfo">
+            <div class="courseFullInfo border">
+                <p>Description:<br>@Model.Course.Description<br></p>
+                <p>Language:<br>@Model.Course.Language<br></p>
+                <p>Difficulty:<br>@Model.Course.DifficultyLevel<br></p>
+            </div>
+            <div class="courseExtraInfo border">
+
+                @if (currentUser == null)
+                {
+                    <p><a asp-controller="Account" asp-action="Login"
+                        class="link-danger link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                        style="margin-top: 10px;">You need to log in</a></p>
+                }
+
+                @if (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()))
+                {
+                    bool isUserRegistered = Model.UsersAndCourse.Any(uc => uc.CourseId ==
+                        Model.Course.CourseId && uc.StartDate != null);
+                    if (!isUserRegistered)
+                    {
+                        <div class="courseButtons">
+                            <a type="button" class="btn btn-sm btn-outline-secondary">Register</a>
                         </div>
-                        <div class="tab-pane fade" id="detail">
-                            <p></p>
-                            <h4>Short Detail</h4>
-                            <p>Iki mung detail singkat wae soale seko jenenge wae wis short detail dadi yo ojo dowo-dowo.</p>
-                            <table class="table table-th-block">
-                                <tbody>
-                                    <tr><td class="active">Bedrooms:</td><td>5 beds</td></tr>
-                                    <tr><td class="active">Bathrooms:</td><td>2 baths</td></tr>
-                                    <tr><td class="active">Single Family:</td><td>2,957 sq ft</td></tr>
-                                    <tr><td class="active">Lot:</td><td>0.26 acres</td></tr>
-                                    <tr><td class="active">Year Built:</td><td>1998</td></tr>
-                                    <tr><td class="active">Last Sold:</td><td>Apr 1998 for $225,000</td></tr>
-                                    <tr><td class="active">Heating Type:</td><td><a href="#">Contact for details</a></td></tr>
-                                </tbody>
-                            </table>
+                    }
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
+                {
+                        <div class="courseButtons">
+                            <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                                type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                            <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                                type="button" class="btn btn-sm btn-outline-secondary"
+                                style="background-color: #FE6C6C;">Delete this course</a>
                         </div>
-                        <div class="tab-pane fade" id="contact">
-                            <p></p>
-                            <form role="form">
-                                <div class="form-group">
-                                    <label>Full name</label>
-                                    <input type="text" class="form-control rounded" placeholder="Enter full name">
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone number</label>
-                                    <input type="text" class="form-control rounded" placeholder="(000)0000000">
-                                </div>
-                                <div class="form-group">
-                                    <label>Email address</label>
-                                    <input type="email" class="form-control rounded" placeholder="Enter email">
-                                </div>
-                                <div class="form-group">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox"> Buy this property
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Message to agent</label>
-                                    <textarea class="form-control rounded" style="height: 100px;"></textarea>
-                                    <p class="help-block">Please be polite and professional</p>
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-danger" data-original-title="" title="">Send message</button>
-                                </div>
-                            </form>
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
+                {
+                        <div class="courseButtons">
+                            <a type="button" class="btn btn-sm btn-outline-secondary">Register</a>
+                            <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                                class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                            <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                                type="button" class="btn btn-sm btn-outline-secondary"
+                                style="background-color: #FE6C6C;">Delete this course</a>
                         </div>
-                    </div>
+                }
+
+                <div class="courseUsers border-top">
+                    <p>Teacher:<br>
+                        @foreach (var user in Model.UsersAndCourse)
+                        {
+                            @if (await UserManager.IsInRoleAsync(user.User, "Teacher"))
+                            {
+                            <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
+                                asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
+                            }
+                        }
+                    </p>
+                    <br>
+                    <p>Students:
+                        @foreach (var user in Model.UsersAndCourse)
+                        {
+                            @if (await UserManager.IsInRoleAsync(@user.User, "Student")
+                                   || await UserManager.IsInRoleAsync(@user.User, "Admin"))
+                            {
+                                <div class="user">
+                                    <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
+                                         asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
+                                    @if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()) ||
+                                        await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
+                                    {
+                                        <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
+                                            asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@user.User.Id">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                            style="background-color: #FE6C6C; width: 70px; height: 25px; margin-right:10px; 
+                                            display: flex; align-items: center; justify-content: center;">Remove</button>
+                                        </form>
+                                    }
+                                </div>
+                            }
+                        }
+                    </p>
+            
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+</body>
+
+</html>

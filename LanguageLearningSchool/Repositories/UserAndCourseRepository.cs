@@ -2,6 +2,7 @@
 using LanguageLearningSchool.Interfaces;
 using LanguageLearningSchool.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace LanguageLearningSchool.Repositories
 {
@@ -34,6 +35,11 @@ namespace LanguageLearningSchool.Repositories
         public UserAndCourse? GetById(int id)
         {
             return _context.UsersAndCourses.FirstOrDefault(c => c.UserAndCourseId == id);
+        }
+
+        public UserAndCourse FirstOrDefault(Expression<Func<UserAndCourse, bool>> predicate)
+        {
+            return _context.UsersAndCourses.FirstOrDefault(predicate);
         }
 
         public bool Save()

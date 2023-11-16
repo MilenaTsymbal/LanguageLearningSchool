@@ -94,6 +94,8 @@ public class AccountController : Controller
             return View(registerViewModel);
         }
 
+        await CreateAppUserRoles();
+
         var newUser = new User
         {
             Name = registerViewModel.Name,
@@ -102,7 +104,7 @@ public class AccountController : Controller
             PhoneNumber = registerViewModel.PhoneNumber,
             UserName = registerViewModel.Email,
             Email = registerViewModel.Email,
-            UserRole = Roles.Student
+            UserRole = registerViewModel.UserRole
         };
         var newUserResponse = await _userManager.CreateAsync(newUser, registerViewModel.Password);
 
@@ -124,5 +126,22 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
 
         return RedirectToAction("Index", "Home");
+    }
+    private async Task CreateAppUserRoles()
+    {
+        if (!await _roleManager.RoleExistsAsync(Roles.Admin.ToString()))
+        {
+            await _roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
+        }
+
+        if (!await _roleManager.RoleExistsAsync(Roles.Teacher.ToString()))
+        {
+            await _roleManager.CreateAsync(new IdentityRole(Roles.Teacher.ToString()));
+        }
+
+        if (!await _roleManager.RoleExistsAsync(Roles.Student.ToString()))
+        {
+            await _roleManager.CreateAsync(new IdentityRole(Roles.Student.ToString()));
+        }
     }
 }
