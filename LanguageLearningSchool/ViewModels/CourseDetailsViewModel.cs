@@ -5,7 +5,7 @@ namespace LanguageLearningSchool.ViewModels
     public class CourseDetailsViewModel
     {
         public Course Course { get; set; }
-        //public List<User> Users { get; set; }
         public List<UserAndCourse> UsersAndCourse { get; set; }
+        public List<Lesson> Lessons { get; set; }
     }
 }

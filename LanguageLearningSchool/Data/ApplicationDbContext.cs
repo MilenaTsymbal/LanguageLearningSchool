@@ -14,5 +14,6 @@ namespace LanguageLearningSchool.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<UserAndCourse> UsersAndCourses { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
     }
 }

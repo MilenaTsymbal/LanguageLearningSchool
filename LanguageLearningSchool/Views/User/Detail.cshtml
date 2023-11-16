@@ -36,12 +36,13 @@
             height: 150px;
         }
         .courseInfo {
-            display: flex;
+            /*display: flex;*/
             width: 100%;
         }
 
         .courseFullInfo {
-            width: 70%;
+            /*width: 70%;*/
+            width: 100%;
         }
 
         .userDetails {
@@ -91,23 +92,11 @@
                         <p>Email:<br>@Model.User.Email<br></p>
                         <p>Role:<br>@Model.User.UserRole<br></p>
                         <br>
-                        @if (await UserManager.IsInRoleAsync(@Model.User, Roles.Student.ToString()))
-                        {
-                                <p>Сourses @Model.User.Name @Model.User.Surname registered for:</p>
-                        }
-                        else if (await UserManager.IsInRoleAsync(@Model.User, Roles.Teacher.ToString()))
-                        {
-                                <p>Сourses @Model.User.Name @Model.User.Surname have created:</p>
-                        }
-                        else if (await UserManager.IsInRoleAsync(@Model.User, Roles.Admin.ToString()))
-                        {
-                                <p>Сourses @Model.User.Name @Model.User.Surname have created or registered for:</p>
-                        }
                     </div>
-                    @if (await UserManager.IsInRoleAsync(@Model.User, Roles.Teacher.ToString())
-                    || await UserManager.IsInRoleAsync(@Model.User, Roles.Admin.ToString()))
+                    @if (await UserManager.IsInRoleAsync(@Model.User, Roles.Teacher.ToString()))
                     {
                         <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Сourses @Model.User.Name @Model.User.Surname has created:</p>
                             @foreach (var item in Model.UserAndCourses)
                             {
                                 var currentColour = LanguageColour[item.Course.Language];
@@ -120,7 +109,8 @@
                                                     <h5>@item.Course.CourseName</h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p>Date of creation of this course:<br>@item.DateOfCreation</p>
                                                 <div class="btn-group">
                                                     <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" type="button" class="btn btn-sm btn-outline-secondary">View</a>
                                                 </div>
@@ -131,10 +121,113 @@
                             }
                         </div>
                     }
+                    else if (await UserManager.IsInRoleAsync(@Model.User, Roles.Admin.ToString()))
+                    {
+                        <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Сourses @Model.User.Name @Model.User.Surname is registered for:</p>
+                            <p>On progress:</p>
+                            @foreach (var item in Model.UserAndCourses)
+                            {
+                                if (item.EndDate == null)
+                                {
+                                    var currentColour = LanguageColour[item.Course.Language];
+                                        <div class="col-md-4">
+                                            <div class="card mb-4 box-shadow">
+                                                <div class="card-img-top"
+                                                    data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
+                                                        style="height: 150px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: @currentColour"
+                                                    data-holder-rendered="true">
+                                                            <h5>@item.Course.CourseName</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div>
+                                                        <p>Start date:<br>@item.StartDate</p>
+                                                        <div class="btn-group">
+                                                            <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
+                                                                type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                                                            <a asp-controller="User" asp-action="LeaveCourse" asp-route-courseId="@item.CourseId" 
+                                                                type="button" class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;">
+                                                                Leave course</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                }
+
+                            }
+                        </div>
+
+                        <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Passed:</p>
+                            @foreach (var item in Model.UserAndCourses)
+                            {
+                                if (item.EndDate != null)
+                                {
+                                    var currentColour = LanguageColour[item.Course.Language];
+                                    <div class="col-md-4">
+                                        <div class="card mb-4 box-shadow">
+                                            <div class="card-img-top"
+                                                data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
+                                                    style="height: 150px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: @currentColour"
+                                                data-holder-rendered="true">
+                                                        <h5>@item.Course.CourseName</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div>
+                                                    <p>Start date:<br>@item.StartDate</p>
+                                                    <p>End date:<br>@item.EndDate</p>
+                                                    <p>General estimation:<br>@item.GeneralEstimation</p>
+                                                    <div class="btn-group">
+                                                        <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        </div>
+
+                        <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Сourses @Model.User.Name @Model.User.Surname has created:</p>
+                            @foreach (var item in Model.UserAndCourses)
+                            {
+                                if (item.DateOfCreation != null)
+                                {
+                                    var currentColour = LanguageColour[item.Course.Language];
+                                    <div class="col-md-4">
+                                        <div class="card mb-4 box-shadow">
+                                            <div class="card-img-top"
+                                                data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
+                                                    style="height: 150px; width: 100%; display: flex; justify-content: center; align-items: center; background-color: @currentColour"
+                                                data-holder-rendered="true">
+                                                        <h5>@item.Course.CourseName</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div>
+                                                    <p>Date of creation of this course:<br>@item.DateOfCreation</p>
+                                                    <div class="btn-group">
+                                                        <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                                                        <a asp-controller="User" asp-action="LeaveCourse" asp-route-courseId="@item.CourseId" 
+                                                            type="button" class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;">
+                                                            Leave course</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                    }
                     else if (await UserManager.IsInRoleAsync(@Model.User, Roles.Student.ToString()))
                     {
-                        <p style="padding-left:10px;">On progress:</p>
                         <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Сourses @Model.User.Name @Model.User.Surname is registered for:</p>
+                            <p>On progress:</p>
                         @foreach (var item in Model.UserAndCourses)
                         {
                             if (item.EndDate == null)
@@ -152,7 +245,8 @@
                                             <div>
                                                 <p>Start date:<br>@item.StartDate</p>
                                                 <div class="btn-group">
-                                                    <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                                                    <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
+                                                        type="button" class="btn btn-sm btn-outline-secondary">View</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -162,8 +256,9 @@
 
                         }
                         </div>
-                        <p style="padding-left:10px">Passed:</p>
+                       
                         <div class="row" style="padding-left:10px; padding-right:10px;">
+                            <p>Passed:</p>
                         @foreach (var item in Model.UserAndCourses)
                         {
                             if (item.EndDate != null)
@@ -195,7 +290,7 @@
                     </div>
                     }
                 </div>
-                <div class="courseExtraInfo border">
+                @*<div class="courseExtraInfo border">
                     <div class="courseButtons">
                         @if (SignInManager.IsSignedIn(User))
                         {
@@ -208,7 +303,7 @@
                                 <a asp-controller="User" asp-action="Delete" asp-route-id="@Model.User.Id" class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;">Delete this account</a>
                             }
                         }
-                    </div>
+                    </div>*@
                 </div>
             </div>
         </div>

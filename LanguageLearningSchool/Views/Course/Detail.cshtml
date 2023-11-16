@@ -67,6 +67,11 @@ var LanguageColour = new Dictionary<Languages, string>
         width: 140px;
     }
 
+    .courseButtons button {
+        margin-top: 10px;
+        width: 140px;
+    }
+
     .courseUsers {
         padding-left: 10px;
         padding-top: 10px;
@@ -78,6 +83,41 @@ var LanguageColour = new Dictionary<Languages, string>
         align-items: center;
         height: 30px;
         width: 100%;
+    }
+
+    .lesson {
+        background-color: #EEEEEE;
+        width: 98.5%;
+        height: 60px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .lessonInfo {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-right: 10px;
+    }
+
+    .lessonInfo a {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .lessonInfo p {
+        padding-top: 5px;
     }
 </style>
 </head>
@@ -94,6 +134,20 @@ var LanguageColour = new Dictionary<Languages, string>
                 <p>Description:<br>@Model.Course.Description<br></p>
                 <p>Language:<br>@Model.Course.Language<br></p>
                 <p>Difficulty:<br>@Model.Course.DifficultyLevel<br></p>
+                <br>
+                <div class="lessonInfo">
+                    <p>Lessons:</p>
+                    <a type="button" class="btn btn-sm btn-outline-secondary">+</a>
+                </div>
+                
+                    @foreach(var lesson in Model.Lessons)
+                    {
+                        <div class="lesson">
+                            <p style="padding-top: 13px;">@lesson.Name</p>
+                            <a asp-controller="Lesson" asp-action="Detail" asp-route-id="@lesson.LessonId" 
+                                type="button" class="btn btn-sm btn-outline-secondary">Start learning</a>
+                        </div>
+                    }
             </div>
             <div class="courseExtraInfo border">
 
@@ -106,43 +160,70 @@ var LanguageColour = new Dictionary<Languages, string>
 
                 @if (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()))
                 {
-                    bool isUserRegistered = Model.UsersAndCourse.Any(uc => uc.CourseId ==
-                        Model.Course.CourseId && uc.StartDate != null);
-                    if (!isUserRegistered)
-                    {
-                        <div class="courseButtons">
-                            <a type="button" class="btn btn-sm btn-outline-secondary">Register</a>
-                        </div>
-                    }
+                    <div class="courseButtons">
+                        @{
+                            bool isUserRegistered = Model.UsersAndCourse.Any(uc => uc.CourseId == @Model.Course.CourseId
+                            && uc.UserId == currentUser.Id && uc.StartDate != null);
+                        }
+                        
+                        @if (!isUserRegistered)
+                        {
+                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                asp-route-courseId="@Model.Course.CourseId">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
+                                asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@currentUser.Id">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                    style="background-color: #FE6C6C; margin-left: 5px">Leave this course</button>
+                            </form>
+                        }
+                    </div>
                 }
                 else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
                 {
-                        <div class="courseButtons">
-                            <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
-                                type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
-                            <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
-                                type="button" class="btn btn-sm btn-outline-secondary"
-                                style="background-color: #FE6C6C;">Delete this course</a>
-                        </div>
+                        <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                            type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                        <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                            type="button" class="btn btn-sm btn-outline-secondary"
+                            style="background-color: #FE6C6C;">Delete this course</a>
+                    
                 }
+                    
                 else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
                 {
-                        <div class="courseButtons">
-                            <a type="button" class="btn btn-sm btn-outline-secondary">Register</a>
-                            <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
-                                class="btn btn-sm btn-outline-secondary">Edit course info</a>
-                            <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
-                                type="button" class="btn btn-sm btn-outline-secondary"
-                                style="background-color: #FE6C6C;">Delete this course</a>
-                        </div>
+                    <div class="courseButtons"> 
+                        @{
+                            bool isUserCreatedCourse = Model.UsersAndCourse.Any(uc => uc.CourseId ==
+                                    Model.Course.CourseId && currentUser.Id == uc.UserId  && uc.DateOfCreation != null);
+                            bool isUserRegistered = Model.UsersAndCourse.Any(uc => currentUser.Id == uc.UserId
+                                && Model.Course.CourseId == uc.CourseId && uc.StartDate != null);
+                        }
+                        @if (!isUserCreatedCourse && !isUserRegistered)
+                        {
+                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                asp-route-courseId="@Model.Course.CourseId">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
+                            </form>
+                        }
+                        <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                            class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                        <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                            type="button" class="btn btn-sm btn-outline-secondary"
+                            style="background-color: #FE6C6C;">Delete this course</a>
+                    </div>
                 }
 
                 <div class="courseUsers border-top">
                     <p>Teacher:<br>
                         @foreach (var user in Model.UsersAndCourse)
                         {
-                            @if (await UserManager.IsInRoleAsync(user.User, "Teacher"))
+                            @if (user.DateOfCreation != null)
                             {
+
                             <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
                                 asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
                             }
@@ -152,8 +233,7 @@ var LanguageColour = new Dictionary<Languages, string>
                     <p>Students:
                         @foreach (var user in Model.UsersAndCourse)
                         {
-                            @if (await UserManager.IsInRoleAsync(@user.User, "Student")
-                                   || await UserManager.IsInRoleAsync(@user.User, "Admin"))
+                            @if (user.DateOfCreation == null)
                             {
                                 <div class="user">
                                     <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"

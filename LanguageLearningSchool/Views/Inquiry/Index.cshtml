@@ -1,0 +1,67 @@
+﻿@using LanguageLearningSchool.ViewModels;
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Data
+@model InquiryViewModel 
+@{
+    ViewBag.Title = "SQL Query Editor";
+}
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<h1 class="text-capitalize">Query Editor</h1> 
+<p class="text-muted">
+    Input your query in the area below and push the "Run" in order to run it.
+</p> 
+<form method="post" asp-action="RunInquiry" class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <textarea name="inquiryText" rows="10" cols="80" class="form-control">@Model.InquiryText</textarea>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-md-12">
+          <input type="submit" value="Run" class="btn btn-primary mt-2"/>
+          <input type="button" value="Clear" class="btn btn-secondary mt-2" onclick="document.querySelector('textarea[name=inquiryText]').value =''"/>
+      </div>
+  </div>
+</form>
+@if (Model.Output != null)
+{
+        <hr/>
+        <h2>Query Result</h2>
+        <table>
+
+            <tr>
+            @foreach (DataColumn column in Model.Output.Columns)
+            {
+                        <th>@column.ColumnName</th>
+            }
+            </tr>
+        @foreach (DataRow row in Model.Output.Rows)
+        {
+                    <tr>
+                @foreach (object unit in row.ItemArray)
+                {
+                    <td>@unit</td>
+                }
+                    </tr>
+        }
+        </table>
+}

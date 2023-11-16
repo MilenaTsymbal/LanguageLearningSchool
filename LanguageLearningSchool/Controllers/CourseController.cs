@@ -1,7 +1,9 @@
 ﻿using LanguageLearningSchool.Interfaces;
 using LanguageLearningSchool.Models;
 using LanguageLearningSchool.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace LanguageLearningSchool.Controllers
@@ -11,11 +13,17 @@ namespace LanguageLearningSchool.Controllers
         private readonly ICourseRepository _courseRepository;
         public readonly IUserRepository _userRepository;
         private readonly IUserAndCourseRepository _userAndCourseRepository;
-        public CourseController(ICourseRepository courseRepository, IUserRepository userRepository, IUserAndCourseRepository userAndCourseRepository)
+        private readonly UserManager<User> _userManager;
+        private readonly ILessonRepository _lessonRepository;
+        public CourseController(ICourseRepository courseRepository, IUserRepository userRepository, 
+            IUserAndCourseRepository userAndCourseRepository, UserManager<User> userManager, 
+            ILessonRepository lessonRepository)
         {
             _courseRepository = courseRepository;
             _userRepository = userRepository;
             _userAndCourseRepository = userAndCourseRepository;
+            _userManager = userManager;
+            _lessonRepository = lessonRepository;
         }
         
         public IActionResult Index()
@@ -43,11 +51,13 @@ namespace LanguageLearningSchool.Controllers
         {
             Course course = _courseRepository.GetById(id);
             var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == id).ToList();
-            
+            var lessons = _lessonRepository.GetAll().FindAll(item => item.CourseId == id).ToList();
+
             var model = new CourseDetailsViewModel
             {
                 Course = course,
-                UsersAndCourse = usersAndCourse
+                UsersAndCourse = usersAndCourse,
+                Lessons = lessons
             };
             return View(model);
         }
@@ -65,6 +75,19 @@ namespace LanguageLearningSchool.Controllers
                 return View(course);
             }
             _courseRepository.Add(course);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var dateOfCreation = DateTime.Now;
+
+            UserAndCourse userAndCourse = new UserAndCourse
+            {
+                CourseId = course.CourseId,
+                UserId = userId,
+                DateOfCreation = dateOfCreation
+            };
+
+            _userAndCourseRepository.Add(userAndCourse);
+
             return RedirectToAction("Index");
         }
 
@@ -72,6 +95,7 @@ namespace LanguageLearningSchool.Controllers
         {
             var course = _courseRepository.GetById(id);
             if (course == null) return View("Error");
+
             var courseViewModel = new EditCourseViewModel
             {
                 CourseId = course.CourseId,
@@ -172,20 +196,16 @@ namespace LanguageLearningSchool.Controllers
 
             var user = _userRepository.GetById(userId);
 
-            if (user != null)
+            Course course = _courseRepository.GetById(courseId);
+            var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == courseId).ToList();
+
+            var model = new CourseDetailsViewModel
             {
-                List<Course> courses = _courseRepository.GetAll();
-                var userAndCourses = _userAndCourseRepository.GetAll().FindAll(item => item.UserId == user.Id).ToList();
+                Course = course,
+                UsersAndCourse = usersAndCourse
+            };
+            return View("Detail", model);
 
-                var coursesInfo = new CourseIndexViewModel
-                {
-                    Courses = courses,
-                    UserAndCourses = userAndCourses
-                };
-                return View("Index", coursesInfo);
-            }
-
-            return View("Error");
         }
     }
 }

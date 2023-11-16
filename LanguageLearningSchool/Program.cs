@@ -12,6 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserAndCourseRepository, UserAndCourseRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

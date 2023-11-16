@@ -61,19 +61,41 @@
                                         <div class="btn-group">
                                             <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
                                                 type="button" class="btn btn-sm btn-outline-secondary">View</a>
-                                            @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()) 
-                                                || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
+
+                                            @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString())))
                                             {
-                                                bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId 
-                                                    && uc.StartDate != null);
+                                                bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId && uc.StartDate != null);
                                                 if (!isUserRegistered)
                                                 {
-                                                    <form method="post" asp-controller="Course" asp-action="AddUserToCourse" asp-route-courseId="@item.CourseId">
-                                                        <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
-                                                    </form>
+                                                <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                                    asp-route-courseId="@item.CourseId">
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                        style="margin-left: 5px">Register</button>
+                                                </form>
                                                 }
                                             }
-                                            
+                                            else if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
+                                            {
+                                                bool isUserCreatedCourse = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId &&
+                                                uc.UserId == currentUser.Id && uc.DateOfCreation != null);
+                                                if (!isUserCreatedCourse)
+                                                {
+                                                    foreach (var user in Model.UserAndCourses)
+                                                    {
+                                                        bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId 
+                                                        && uc.UserId == user.UserId && uc.StartDate != null);
+                                                        if (!isUserRegistered)
+                                                        {
+                                                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                                                asp-route-courseId="@item.CourseId">
+                                                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                                    style="margin-left: 5px">Register</button>
+                                                            </form>
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         </div>
                                     </div>
                                 </div>

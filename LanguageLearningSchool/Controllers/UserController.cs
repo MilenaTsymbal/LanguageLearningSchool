@@ -13,16 +13,20 @@ namespace LanguageLearningSchool.Controllers
 {
     public class UserController : Controller
     {
-        public UserController(IUserRepository userRepository, UserManager<User> userManager, SignInManager<User> signInManager, IUserAndCourseRepository userAndCourseRepository)
+        public UserController(IUserRepository userRepository, UserManager<User> userManager,
+            SignInManager<User> signInManager, ICourseRepository courseRepository, 
+            IUserAndCourseRepository userAndCourseRepository)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _signInManager = signInManager;
+            _courseRepository = courseRepository;
             _userAndCourseRepository = userAndCourseRepository;
         }
         public readonly IUserRepository _userRepository;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly ICourseRepository _courseRepository;
         private readonly IUserAndCourseRepository _userAndCourseRepository;
 
         public IActionResult Index()
@@ -38,12 +42,10 @@ namespace LanguageLearningSchool.Controllers
             
             if (user != null)
             {
-                //var courses = _userAndCourseRepository.GetAll().FindAll(item => item.UserId == user.Id).Select(item => item.Course).ToList();
                 var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
                 var model = new UserDetailViewModel
                 {
                     User = user,
-                    //Courses = userAndCourses.Select(item => item.Course).ToList(),
                     UserAndCourses = userAndCourses
                 };
 
@@ -142,44 +144,74 @@ namespace LanguageLearningSchool.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Register(CourseRegistrationViewModel viewModel)
+
+        public IActionResult LeaveCourse(int courseId)
+        {
+            var course = _courseRepository.GetById(courseId);
+
+            var userLeaveCourseModel = new LeaveCourseViewModel
+            {
+                Course = course
+            };
+
+            return View(userLeaveCourseModel);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmLeaveCourse(int courseId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+            var userAndCourse = _userAndCourseRepository.GetAll().Find(item => item.UserId == userId && item.CourseId == courseId);
+
+            _userAndCourseRepository.Delete(userAndCourse);
+
+
+            var user = _userRepository.GetById(userId);
+
+            if (user != null)
+            {
+                var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
+                var model = new UserDetailViewModel
+                {
+                    User = user,
+                    UserAndCourses = userAndCourses
+                };
+
+                return View("UserDetail", model);
+            }
+
+            return View("Error");
+        }
+        //public IActionResult LeaveCourse(int courseId)
         //{
-        //    if (!User.Identity.IsAuthenticated)
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        //    return View();
+        //}
+        //[HttpPost, ActionName("LeaveCourse")]
+        //public IActionResult LeaveCourse(int courseId)
+        //{
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        //    var userAndCourse = _userAndCourseRepository.GetAll().Find(item => item.UserId == userId && item.CourseId == courseId);
+        //    _userAndCourseRepository.Delete(userAndCourse);
+
+        //    var user = _userRepository.GetById(userId);
+
+        //    if (user != null)
         //    {
-        //        return RedirectToAction("Login", "Account");
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userManager.GetUserAsync(User);
-
-        //        var isRegistered = _context.UserAndCourses
-        //            .Any(uc => uc.CourseId == viewModel.CourseId && uc.UserId == user.Id);
-
-        //        if (isRegistered)
+        //        var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
+        //        var model = new UserDetailViewModel
         //        {
-        //            TempData["Message"] = "You are already registered for this course.";
-        //            return RedirectToAction("Details", new { id = viewModel.CourseId });
-        //        }
-
-        //        var userAndCourse = new UserAndCourse
-        //        {
-        //            UserId = user.Id,
-        //            CourseId = viewModel.CourseId,
-        //            StartDate = viewModel.StartDate,
-        //            EndDate = viewModel.EndDate,
-        //            GeneralEstimation = viewModel.GeneralEstimation,
+        //            User = user,
+        //            UserAndCourses = userAndCourses
         //        };
 
-        //        _context.UserAndCourses.Add(userAndCourse);
-        //        await _context.SaveChangesAsync();
-
-        //        return RedirectToAction("Index", "Home");
+        //        return View("UserDeatil", model);
         //    }
 
-        //    return View(viewModel);
+        //    return View("Error");
         //}
     }
 }
