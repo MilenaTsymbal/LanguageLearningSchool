@@ -35,6 +35,17 @@ namespace LanguageLearningSchool.Repositories
             return _context.LessonTasks.FirstOrDefault(c => c.TaskId == id);
         }
 
+        public List<LessonTask> GetByLessonId(int lessonId)
+        {
+            return _context.LessonTasks.Where(c => c.LessonId == lessonId).ToList();
+        }
+
+        public bool DeleteRange(List<LessonTask> tasks)
+        {
+            _context.Set<LessonTask>().RemoveRange(tasks);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

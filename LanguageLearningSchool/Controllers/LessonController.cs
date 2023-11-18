@@ -12,12 +12,18 @@ namespace LanguageLearningSchool.Controllers
         private readonly ILessonRepository _lessonRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly IUserAndCourseRepository _userAndCourseRepository;
+        private readonly IUserAndLessonRepository _userAndLessonRepository;
+        private readonly ILessonTaskRepository _lessonTaskRepository;
+
         public LessonController(ILessonRepository lessonRepository, ICourseRepository courseRepository, 
-            IUserAndCourseRepository userAndCourseRepository)
+            IUserAndCourseRepository userAndCourseRepository, IUserAndLessonRepository userAndLessonRepository,
+            ILessonTaskRepository lessonTaskRepository)
         {
             _lessonRepository = lessonRepository;
             _courseRepository = courseRepository;
             _userAndCourseRepository = userAndCourseRepository;
+            _userAndLessonRepository = userAndLessonRepository;
+            _lessonTaskRepository = lessonTaskRepository;
         }
 
         public IActionResult Index()
@@ -27,13 +33,29 @@ namespace LanguageLearningSchool.Controllers
 
         public IActionResult Detail(int lessonId, int courseId)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var lesson = _lessonRepository.GetById(lessonId);
+            var userIsLearning = _userAndLessonRepository.GetAll()
+                .FirstOrDefault(item => item.UserId == userId && item.LessonId == lessonId);
+
+            if (userIsLearning == null)
+            {
+                var userAndLesson = new UserAndLesson
+                {
+                    UserId = userId,
+                    LessonId = lessonId
+                };
+                _userAndLessonRepository.Add(userAndLesson);
+            }
+            
             var course = _courseRepository.GetById(courseId);
+            var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == courseId).ToList();
 
             var lessonInfo = new LessonDetailViewModel
             {
                 Lesson = lesson,
-                Course = course
+                Course = course,
+                UsersAndCourse = usersAndCourse
             };
 
             return View(lessonInfo);
@@ -41,9 +63,11 @@ namespace LanguageLearningSchool.Controllers
 
         public IActionResult Create(int courseId)
         {
+            var course = _courseRepository.GetById(courseId);
             var createModel = new CreateLessonViewModel
             {
-                CourseId = courseId
+                CourseId = courseId,
+                CourseName = course.CourseName
             };
             return View(createModel);
         }
@@ -143,7 +167,16 @@ namespace LanguageLearningSchool.Controllers
             var courseId = lesson.CourseId;
             if (lesson == null) return View("Error");
 
+            var userAndLesson = _userAndLessonRepository.GetAll().FindAll(ul => ul.LessonId == lessonId);
+
+            var userAndLessonsToDelete = _userAndLessonRepository.GetAll().Where(ul => ul.LessonId == lessonId).ToList();
+            _userAndLessonRepository.DeleteRange(userAndLessonsToDelete);
+
+            var lessonTasksToDelete = _lessonTaskRepository.GetAll().Where(lt => lt.LessonId == lessonId).ToList();
+            _lessonTaskRepository.DeleteRange(lessonTasksToDelete);
+
             _lessonRepository.Delete(lesson);
+
             return RedirectToAction("Detail", "Course", new { id = courseId });
         }
 

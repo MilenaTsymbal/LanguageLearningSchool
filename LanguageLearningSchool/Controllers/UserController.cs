@@ -43,7 +43,7 @@ namespace LanguageLearningSchool.Controllers
             if (user != null)
             {
                 var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
-                var model = new UserDetailViewModel
+                var model = new UserDetailsViewModel
                 {
                     User = user,
                     UserAndCourses = userAndCourses
@@ -61,7 +61,7 @@ namespace LanguageLearningSchool.Controllers
             if (user != null)
             {
                 var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
-                var model = new UserDetailViewModel
+                var model = new UserDetailsViewModel
                 {
                     User = user,
                     UserAndCourses = userAndCourses
@@ -172,7 +172,7 @@ namespace LanguageLearningSchool.Controllers
             if (user != null)
             {
                 var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
-                var model = new UserDetailViewModel
+                var model = new UserDetailsViewModel
                 {
                     User = user,
                     UserAndCourses = userAndCourses

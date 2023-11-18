@@ -2,9 +2,10 @@
 @using LanguageLearningSchool.Repositories;
 @using LanguageLearningSchool.ViewModels;
 @model CreateLessonViewModel
-<h5>Create lesson in course "@Model.CourseId"</h5>
+<h5>Create lesson in course "@Model.CourseName"</h5>
 <form method="post" asp-action="Create">
     <input asp-for="@Model.CourseId" type="hidden" class="form-control">
+    <input asp-for="@Model.CourseName" type="hidden" class="form-control">
     <div class="form-group">
         <label asp-for="@Model.LessonName">Lesson name</label>
         <input asp-for="@Model.LessonName" type="text" class="form-control" placeholder="Enter lesson name">

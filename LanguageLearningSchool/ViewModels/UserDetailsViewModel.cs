@@ -3,7 +3,7 @@ using LanguageLearningSchool.Models;
 
 namespace LanguageLearningSchool.ViewModels
 {
-    public class UserDetailViewModel
+    public class UserDetailsViewModel
     {
         public User User { get; set; }
         public List<UserAndCourse> UserAndCourses { get; set; }

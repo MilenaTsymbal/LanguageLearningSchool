@@ -15,15 +15,17 @@ namespace LanguageLearningSchool.Controllers
         private readonly IUserAndCourseRepository _userAndCourseRepository;
         private readonly UserManager<User> _userManager;
         private readonly ILessonRepository _lessonRepository;
+        private readonly IUserAndLessonRepository _userAndLessonRepository;
         public CourseController(ICourseRepository courseRepository, IUserRepository userRepository, 
             IUserAndCourseRepository userAndCourseRepository, UserManager<User> userManager, 
-            ILessonRepository lessonRepository)
+            ILessonRepository lessonRepository, IUserAndLessonRepository userAndLessonRepository)
         {
             _courseRepository = courseRepository;
             _userRepository = userRepository;
             _userAndCourseRepository = userAndCourseRepository;
             _userManager = userManager;
             _lessonRepository = lessonRepository;
+            _userAndLessonRepository = userAndLessonRepository;
         }
         
         public IActionResult Index()
@@ -52,12 +54,14 @@ namespace LanguageLearningSchool.Controllers
             Course course = _courseRepository.GetById(id);
             var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == id).ToList();
             var lessons = _lessonRepository.GetAll().FindAll(item => item.CourseId == id).ToList();
+            var userAndLessons = _userAndLessonRepository.GetUserAndLessonsForCourse(id);
 
             var model = new CourseDetailsViewModel
             {
                 Course = course,
                 UsersAndCourse = usersAndCourse,
-                Lessons = lessons
+                Lessons = lessons,
+                UserAndLessons = userAndLessons
             };
             return View(model);
         }

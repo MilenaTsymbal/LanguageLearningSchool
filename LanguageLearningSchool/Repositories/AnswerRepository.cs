@@ -37,9 +37,20 @@ namespace LanguageLearningSchool.Repositories
             .ToList();
         }
 
+        public List<Answer> GetAllAnswersOfTask(int taskId)
+        {
+            return _context.Answers.Where(a => a.TaskId == taskId).ToList();
+        }
+
         public Answer GetById(int id)
         {
             return _context.Answers.FirstOrDefault(c => c.TaskId == id);
+        }
+
+        public bool UpdateRange(List<Answer> answers)
+        {
+            _context.Set<Answer>().UpdateRange(answers);
+            return Save();
         }
 
         public bool Save()

@@ -1,6 +1,7 @@
 ﻿using LanguageLearningSchool.Data;
 using LanguageLearningSchool.Interfaces;
 using LanguageLearningSchool.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LanguageLearningSchool.Repositories
 {
@@ -33,6 +34,18 @@ namespace LanguageLearningSchool.Repositories
         public UserAndLesson GetById(int id)
         {
             return _context.UsersAndLessons.FirstOrDefault(c => c.UserAndLessonId == id);
+        }
+
+        public List<UserAndLesson> GetUserAndLessonsForCourse(int courseId)
+        {
+            return _context.UsersAndLessons.Include(ual => ual.User).Include(ual => ual.Lesson)
+                .Where(ual => ual.Lesson.CourseId == courseId).ToList();
+        }
+
+        public bool DeleteRange(List<UserAndLesson> userAndLesson)
+        {
+            _context.Set<UserAndLesson>().RemoveRange(userAndLesson);
+            return Save();
         }
 
         public bool Save()

@@ -1,4 +1,5 @@
 ﻿@using LanguageLearningSchool.Enums;
+@using LanguageLearningSchool.Repositories;
 @using LanguageLearningSchool.ViewModels;
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<User> UserManager
@@ -20,6 +21,14 @@
     };
 
     var currentColour = LanguageColour[@Model.Course.Language];
+
+    //var currentUserHasAccess = Model.UsersAndCourse.Any(uc =>
+    //    uc.CourseId == Model.Course.CourseId && currentUser.Id == uc.UserId &&
+    //    (uc.DateOfCreation != null || uc.StartDate != null));
+    bool isUserCreatedCourse = Model.UsersAndCourse.Any(uc => uc.CourseId ==
+        Model.Course.CourseId && currentUser.Id == uc.UserId && uc.DateOfCreation != null);
+    bool isUserRegistered = Model.UsersAndCourse.Any(uc => currentUser.Id == uc.UserId
+        && Model.Course.CourseId == uc.CourseId && uc.StartDate != null);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -147,24 +156,65 @@
             </div>
         </div>
         <div class="courseExtraInfo border">
-            <div class=lessonEstimation>
-                <p>Grade:</p>
-                <p>LessonEstimation</p>
-            </div>
-            <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
-                align-items: center; margin-bottom: 10px;">
-                <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
-                    width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
-            </div>
-            <div style="display: flex; flex-direction: column; justify-content: center;
-                align-items: center; margin-bottom: 10px; margin-top: 10px;">
-                <a asp-controller="Lesson" asp-action="Edit" asp-route-lessonId="@Model.Lesson.LessonId"
-                    type="button" class="btn btn-sm btn-outline-secondary" style="margin-bottom: 10px; width: 140px;">
-                    Edit lesson info</a>
-                <a asp-controller="Lesson" asp-action="Delete" asp-route-lessonId="@Model.Lesson.LessonId"
-                    type="button" class="btn btn-sm btn-outline-secondary"
-                    style="background-color: #FE6C6C; margin-bottom: 10px; width: 140px;">Delete this lesson</a>
-            </div>
+                @if (isUserCreatedCourse)
+                {
+                    <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                        align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                        <a asp-area="" asp-controller="LessonTask" asp-action="TestDetails" asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-bottom: 10px; 
+                            width: 140px;" class="btn btn-sm btn-outline-secondary">View the test</a>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center;
+                        align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                        <a asp-controller="Lesson" asp-action="Edit" asp-route-lessonId="@Model.Lesson.LessonId"
+                            type="button" class="btn btn-sm btn-outline-secondary" style="margin-bottom: 10px; width: 140px;">
+                            Edit lesson info</a>
+                        <a asp-controller="Lesson" asp-action="Delete" asp-route-lessonId="@Model.Lesson.LessonId"
+                            type="button" class="btn btn-sm btn-outline-secondary"
+                            style="background-color: #FE6C6C; margin-bottom: 10px; width: 140px;">Delete this lesson</a>
+                    </div>
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
+                {
+                    if (isUserRegistered)
+                    {
+                        <div class=lessonEstimation>
+                            <p>Grade:</p>
+                            <p>LessonEstimation</p>
+                        </div>
+                        <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                            align-items: center; margin-bottom: 10px;">
+                            <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
+                                width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
+                            
+                        </div>
+                        
+                    }
+                        <div style="display: flex; flex-direction: column; justify-content: center;
+                            align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                            <a asp-area="" asp-controller="LessonTask" asp-action="TestDetails" asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-bottom: 10px; 
+                                width: 140px;" class="btn btn-sm btn-outline-secondary">View the test</a>
+                            <a asp-controller="Lesson" asp-action="Edit" asp-route-lessonId="@Model.Lesson.LessonId"
+                                type="button" class="btn btn-sm btn-outline-secondary" style="margin-bottom: 10px; width: 140px;">
+                                Edit lesson info</a>
+                            <a asp-controller="Lesson" asp-action="Delete" asp-route-lessonId="@Model.Lesson.LessonId"
+                                type="button" class="btn btn-sm btn-outline-secondary"
+                                style="background-color: #FE6C6C; margin-bottom: 10px; width: 140px;">Delete this lesson</a>
+                        </div>
+
+                }
+                else
+                {
+                    <div class=lessonEstimation>
+                        <p>Grade:</p>
+                        <p>LessonEstimation</p>
+                    </div>
+                    <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                        align-items: center; margin-bottom: 10px;">
+                        <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
+                            width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
+                    </div>
+                }
+
         </div>
     </div>
 </div>

@@ -153,16 +153,24 @@
                                 type="button" class="btn btn-sm btn-outline-secondary">+</a>
                         }
                     </div>
-
                     @foreach (var lesson in Model.Lessons)
                     {
                         <div class="lesson">
                             <p style="padding-top: 13px;">@lesson.LessonName</p>
-                            <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId" 
-                                asp-route-courseId="@Model.Course.CourseId"
-                                type="button" class="btn btn-sm btn-outline-secondary">Start learning</a>
-                        </div>
-                        }
+                            @if (Model.UserAndLessons.Any(userAndLesson => currentUser.Id == userAndLesson.UserId && lesson.LessonId == userAndLesson.LessonId))
+                            {
+                                <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId"
+                                    asp-route-courseId="@Model.Course.CourseId" type="button"
+                                    class="btn btn-sm btn-outline-secondary" style="width:140px;">Continue learning</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId"
+                                    asp-route-courseId="@Model.Course.CourseId" type="button"
+                                    class="btn btn-sm btn-outline-secondary" style="width:140px;">Start learning</a>
+                            }
+                       </div>
+                    }
                 }
 
             </div>

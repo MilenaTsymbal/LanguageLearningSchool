@@ -1,0 +1,48 @@
+﻿@using LanguageLearningSchool.ViewModels;
+@model TestDetailsViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        .taskInfo {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h5>Test details for the "@Model.LessonName" lesson</h5>
+        @foreach(var task in Model.Tasks)
+        {
+            <div class="taskAndAnswers">
+                <div class="taskInfo"> 
+                    <h6>@task.TaskText</h6>
+                    <div>
+                            <a asp-area="" asp-controller="LessonTask" asp-action="Edit" asp-route-taskId="@task.TaskId" method="get" 
+                                style="width: 140px; margin-left: 10px;" class="btn btn-sm btn-outline-secondary">
+                                Edit this task</a>
+                            <a asp-area="" method="get" style="background-color: #FE6C6C; width: 140px;" 
+                            class="btn btn-sm btn-outline-secondary">Delete this task</a>
+                    </div>
+                </div>
+                @foreach(var answer in Model.Answers)
+                {
+                    if(answer.TaskId == task.TaskId)
+                    {
+                        <p>@answer.AnswerName (@answer.Correctness)</p>
+                    }
+                }
+            </div>
+        }
+    </div>
+</body>
+</html>

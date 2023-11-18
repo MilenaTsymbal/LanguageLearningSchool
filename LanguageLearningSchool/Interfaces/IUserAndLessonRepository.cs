@@ -6,6 +6,8 @@ namespace LanguageLearningSchool.Interfaces
     {
         List<UserAndLesson> GetAll();
         UserAndLesson GetById(int id);
+        List<UserAndLesson> GetUserAndLessonsForCourse(int courseId);
+        bool DeleteRange(List<UserAndLesson> userAndLesson);
         bool Add(UserAndLesson userAndLesson);
         bool Delete(UserAndLesson userAndLesson);
         bool Update(UserAndLesson userAndLesson);
