@@ -13,6 +13,10 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserAndCourseRepository, UserAndCourseRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ILessonTaskRepository, LessonTaskRepository>();
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
+builder.Services.AddScoped<IUserAndLessonRepository, UserAndLessonRepository>();
+builder.Services.AddScoped<IUserAndTaskRepository, UserAndTaskRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

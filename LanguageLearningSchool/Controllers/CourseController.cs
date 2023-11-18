@@ -170,22 +170,7 @@ namespace LanguageLearningSchool.Controllers
 
             _userAndCourseRepository.Add(userAndCourse);
 
-            var user = _userRepository.GetById(userId);
-
-            if (user != null)
-            {
-                List<Course> courses = _courseRepository.GetAll();
-                var userAndCourses = _userAndCourseRepository.GetAll().FindAll(item => item.UserId == user.Id).ToList();
-
-                var coursesInfo = new CourseIndexViewModel
-                {
-                    Courses = courses,
-                    UserAndCourses = userAndCourses
-                };
-                return View("Index", coursesInfo);
-            }
-
-            return View("Error");
+            return RedirectToAction("Detail", "Course", new {id = courseId });
         }
 
         [HttpPost]

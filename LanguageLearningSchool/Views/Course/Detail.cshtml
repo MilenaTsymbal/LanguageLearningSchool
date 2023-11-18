@@ -5,8 +5,8 @@
 @inject RoleManager<IdentityRole> RoleManager
 @model CourseDetailsViewModel
 @{
-var currentUser = await UserManager.GetUserAsync(User);
-var LanguageColour = new Dictionary<Languages, string>
+    var currentUser = await UserManager.GetUserAsync(User);
+    var LanguageColour = new Dictionary<Languages, string>
     {
     {Languages.English, "#FED6BC"},
     {Languages.Spanish, "#FFFADD"},
@@ -18,8 +18,16 @@ var LanguageColour = new Dictionary<Languages, string>
     {Languages.Portuguese, "#B5F2EA"},
     {Languages.Korean, "#C6D8FF"},
     };
-
     var currentColour = LanguageColour[Model.Course.Language];
+
+    var currentUserHasAccess = Model.UsersAndCourse.Any(uc =>
+        uc.CourseId == Model.Course.CourseId && currentUser.Id == uc.UserId &&
+        (uc.DateOfCreation != null || uc.StartDate != null));
+    bool isUserCreatedCourse = Model.UsersAndCourse.Any(uc => uc.CourseId ==
+        Model.Course.CourseId && currentUser.Id == uc.UserId && uc.DateOfCreation != null);
+    bool isUserRegistered = Model.UsersAndCourse.Any(uc => currentUser.Id == uc.UserId
+        && Model.Course.CourseId == uc.CourseId && uc.StartDate != null);
+    
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -135,19 +143,28 @@ var LanguageColour = new Dictionary<Languages, string>
                 <p>Language:<br>@Model.Course.Language<br></p>
                 <p>Difficulty:<br>@Model.Course.DifficultyLevel<br></p>
                 <br>
-                <div class="lessonInfo">
-                    <p>Lessons:</p>
-                    <a type="button" class="btn btn-sm btn-outline-secondary">+</a>
-                </div>
-                
-                    @foreach(var lesson in Model.Lessons)
+                @if (currentUserHasAccess)
+                {
+                    <div class="lessonInfo">
+                        <p>Lessons:</p>
+                        @if(isUserCreatedCourse || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
+                        {
+                            <a asp-controller="Lesson" asp-action="Create" asp-route-courseId="@Model.Course.CourseId" 
+                                type="button" class="btn btn-sm btn-outline-secondary">+</a>
+                        }
+                    </div>
+
+                    @foreach (var lesson in Model.Lessons)
                     {
                         <div class="lesson">
-                            <p style="padding-top: 13px;">@lesson.Name</p>
-                            <a asp-controller="Lesson" asp-action="Detail" asp-route-id="@lesson.LessonId" 
+                            <p style="padding-top: 13px;">@lesson.LessonName</p>
+                            <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId" 
+                                asp-route-courseId="@Model.Course.CourseId"
                                 type="button" class="btn btn-sm btn-outline-secondary">Start learning</a>
                         </div>
-                    }
+                        }
+                }
+
             </div>
             <div class="courseExtraInfo border">
 
@@ -161,11 +178,6 @@ var LanguageColour = new Dictionary<Languages, string>
                 @if (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()))
                 {
                     <div class="courseButtons">
-                        @{
-                            bool isUserRegistered = Model.UsersAndCourse.Any(uc => uc.CourseId == @Model.Course.CourseId
-                            && uc.UserId == currentUser.Id && uc.StartDate != null);
-                        }
-                        
                         @if (!isUserRegistered)
                         {
                             <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
@@ -181,27 +193,25 @@ var LanguageColour = new Dictionary<Languages, string>
                                     style="background-color: #FE6C6C; margin-left: 5px">Leave this course</button>
                             </form>
                         }
-                    </div>
-                }
-                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
-                {
-                        <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
-                            type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
-                        <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
-                            type="button" class="btn btn-sm btn-outline-secondary"
-                            style="background-color: #FE6C6C;">Delete this course</a>
-                    
+                        </div>
+                    }
+                    else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
+                    {
+                        if (isUserCreatedCourse)
+                        {
+                            <div class="courseButtons">
+                                <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                                    type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                                <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                                    type="button" class="btn btn-sm btn-outline-secondary"
+                                    style="background-color: #FE6C6C;">Delete this course</a>
+                            </div>
+                        }
                 }
                     
                 else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
                 {
                     <div class="courseButtons"> 
-                        @{
-                            bool isUserCreatedCourse = Model.UsersAndCourse.Any(uc => uc.CourseId ==
-                                    Model.Course.CourseId && currentUser.Id == uc.UserId  && uc.DateOfCreation != null);
-                            bool isUserRegistered = Model.UsersAndCourse.Any(uc => currentUser.Id == uc.UserId
-                                && Model.Course.CourseId == uc.CourseId && uc.StartDate != null);
-                        }
                         @if (!isUserCreatedCourse && !isUserRegistered)
                         {
                             <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
@@ -239,7 +249,7 @@ var LanguageColour = new Dictionary<Languages, string>
                                     <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
                                          asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
                                     @if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()) ||
-                                        await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
+                                        isUserCreatedCourse)
                                     {
                                         <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
                                             asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@user.User.Id">

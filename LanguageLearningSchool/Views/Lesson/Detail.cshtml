@@ -1,5 +1,173 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using LanguageLearningSchool.Enums;
+@using LanguageLearningSchool.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@model LessonDetailViewModel
 @{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var LanguageColour = new Dictionary<Languages, string>
+    {
+    {Languages.English, "#FED6BC"},
+    {Languages.Spanish, "#FFFADD"},
+    {Languages.French, "#DEF7FE"},
+    {Languages.German, "#E7ECFF"},
+    {Languages.Chinese, "#C3FBD8"},
+    {Languages.Japanese, "#FDEED9"},
+    {Languages.Italian, "#F6FFF8"},
+    {Languages.Portuguese, "#B5F2EA"},
+    {Languages.Korean, "#C6D8FF"},
+    };
+
+    var currentColour = LanguageColour[@Model.Course.Language];
 }
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .courseDetail {
+        width: 100%;
+        align-items: stretch;
+        display: flex;
+    }
+
+    .courseBackgroundColour {
+        width: 100%;
+        height: 150px;
+    }
+
+    .courseInfo {
+        display: flex;
+        width: 70%;
+    }
+
+    .courseFullInfo {
+        width: 100%;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    .courseExtraInfo {
+        width: 30%;
+    }
+
+    .courseButtons {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .courseButtons a {
+        margin-top: 10px;
+        width: 140px;
+    }
+
+    .courseButtons button {
+        margin-top: 10px;
+        width: 140px;
+    }
+
+    .courseUsers {
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    .user {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 30px;
+        width: 100%;
+    }
+
+    .lesson {
+        background-color: #EEEEEE;
+        width: 98.5%;
+        height: 60px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .lessonInfo {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-right: 10px;
+    }
+
+    .lessonInfo a {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .lessonInfo p {
+        padding-top: 5px;
+    }
+
+    .lessonEstimation {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="courseBackgroundColour"
+        style="display: flex; justify-content: center; align-items: center; background-color: @currentColour;">
+        <h5>@Model.Course.CourseName</h5>
+    </div>
+    <div class="courseDetail">
+        <div class="courseInfo">
+            <div class="courseFullInfo border">
+                <p>Subject:<br>@Model.Lesson.LessonName<br></p>
+                <p>Material:<br>@Model.Lesson.Material<br></p>
+                <br>
+            </div>
+        </div>
+        <div class="courseExtraInfo border">
+            <div class=lessonEstimation>
+                <p>Grade:</p>
+                <p>LessonEstimation</p>
+            </div>
+            <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                align-items: center; margin-bottom: 10px;">
+                <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
+                    width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center;
+                align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                <a asp-controller="Lesson" asp-action="Edit" asp-route-lessonId="@Model.Lesson.LessonId"
+                    type="button" class="btn btn-sm btn-outline-secondary" style="margin-bottom: 10px; width: 140px;">
+                    Edit lesson info</a>
+                <a asp-controller="Lesson" asp-action="Delete" asp-route-lessonId="@Model.Lesson.LessonId"
+                    type="button" class="btn btn-sm btn-outline-secondary"
+                    style="background-color: #FE6C6C; margin-bottom: 10px; width: 140px;">Delete this lesson</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

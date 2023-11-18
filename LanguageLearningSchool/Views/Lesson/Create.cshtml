@@ -1,0 +1,21 @@
+﻿@using LanguageLearningSchool.Controllers;
+@using LanguageLearningSchool.Repositories;
+@using LanguageLearningSchool.ViewModels;
+@model CreateLessonViewModel
+<h5>Create lesson in course "@Model.CourseId"</h5>
+<form method="post" asp-action="Create">
+    <input asp-for="@Model.CourseId" type="hidden" class="form-control">
+    <div class="form-group">
+        <label asp-for="@Model.LessonName">Lesson name</label>
+        <input asp-for="@Model.LessonName" type="text" class="form-control" placeholder="Enter lesson name">
+        <span asp-validation-for="@Model.LessonName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Material">Material</label>
+            <textarea asp-for="@Model.Material" type="text" class="form-control" 
+            id="exampleFormControlTextarea1" rows="3" placeholder="Enter the material"></textarea>
+        <span asp-validation-for="@Model.Material" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-top: 15px">Create</button>
+</form>
