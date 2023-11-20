@@ -222,7 +222,7 @@
                     }
                     else if (await UserManager.IsInRoleAsync(@Model.User, Roles.Student.ToString()))
                     {
-                        <p>Сourses you are registered for:</p>
+                        <p  style="padding-left:10px;">Сourses you are registered for:</p>
                         <p style="padding-left:10px;">On progress:</p>
                         <div class="row" style="padding-left:10px; padding-right:10px;">
                             @foreach (var item in Model.UserAndCourses)

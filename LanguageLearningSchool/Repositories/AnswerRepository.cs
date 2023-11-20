@@ -26,11 +26,6 @@ namespace LanguageLearningSchool.Repositories
             return Save();
         }
 
-        public List<Answer> GetAll(int taskId)
-        {
-            return _context.Answers.Where(a => a.TaskId == taskId).ToList(); ;
-        }
-
         public List<Answer> GetAllAnswersOfLesson(int lessonId)
         {
             return _context.Answers.Where(a => _context.LessonTasks.Any(lt => lt.LessonId == lessonId && lt.TaskId == a.TaskId))
@@ -50,6 +45,18 @@ namespace LanguageLearningSchool.Repositories
         public bool UpdateRange(List<Answer> answers)
         {
             _context.Set<Answer>().UpdateRange(answers);
+            return Save();
+        }
+
+        public bool AddRange(List<Answer> answers)
+        {
+            _context.Set<Answer>().AddRange(answers);
+            return Save();
+        }
+
+        public bool DeleteRange(List<Answer> answers)
+        {
+            _context.Set<Answer>().RemoveRange(answers);
             return Save();
         }
 

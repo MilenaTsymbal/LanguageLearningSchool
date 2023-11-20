@@ -112,7 +112,7 @@ namespace LanguageLearningSchool.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(int id, EditCourseViewModel courseViewModel)
+        public IActionResult Edit(int courseId, EditCourseViewModel courseViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -120,7 +120,7 @@ namespace LanguageLearningSchool.Controllers
                 return View("Edit", courseViewModel);
             }
 
-            var course = _courseRepository.GetById(id);
+            var course = _courseRepository.GetById(courseId);
 
             if (course != null)
             {
@@ -131,7 +131,7 @@ namespace LanguageLearningSchool.Controllers
 
                 _courseRepository.Update(course);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Detail", new {id = courseId });
             }
             else
             {
@@ -154,6 +154,14 @@ namespace LanguageLearningSchool.Controllers
             var course = _courseRepository.GetById(id);
             if (course == null) return View("Error");
 
+            var lessonsOnCourse = _lessonRepository.GetAll().Where(l => l.CourseId == course.CourseId).ToList();
+            if (lessonsOnCourse != null && lessonsOnCourse.Any())
+            {
+                _lessonRepository.DeleteRange(lessonsOnCourse);
+            }
+
+            
+
             _courseRepository.Delete(course);
             return RedirectToAction("Index");
         }
@@ -174,27 +182,25 @@ namespace LanguageLearningSchool.Controllers
 
             _userAndCourseRepository.Add(userAndCourse);
 
-            return RedirectToAction("Detail", "Course", new {id = courseId });
+            return RedirectToAction("Detail", new {id = courseId });
         }
 
         [HttpPost]
         public IActionResult RemoveUserFromCourse(int courseId, string userId)
         {
             var userAndCourse = _userAndCourseRepository.GetAll().Find(item => item.UserId == userId && item.CourseId == courseId);
+            var userAndLesson = _userAndLessonRepository
+                .GetAllLessonsUserLearning()
+                .Where(ul => ul.UserId == userId && ul.Lesson.CourseId == courseId)
+                .ToList();
+            if (userAndLesson != null)
+            {
+                _userAndLessonRepository.DeleteRange(userAndLesson);
+            }
+
             _userAndCourseRepository.Delete(userAndCourse);
 
-            var user = _userRepository.GetById(userId);
-
-            Course course = _courseRepository.GetById(courseId);
-            var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == courseId).ToList();
-
-            var model = new CourseDetailsViewModel
-            {
-                Course = course,
-                UsersAndCourse = usersAndCourse
-            };
-            return View("Detail", model);
-
+            return RedirectToAction("Detail", new { id = courseId });
         }
     }
 }

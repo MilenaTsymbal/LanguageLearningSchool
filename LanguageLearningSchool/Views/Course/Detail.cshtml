@@ -27,7 +27,9 @@
         Model.Course.CourseId && currentUser.Id == uc.UserId && uc.DateOfCreation != null);
     bool isUserRegistered = Model.UsersAndCourse.Any(uc => currentUser.Id == uc.UserId
         && Model.Course.CourseId == uc.CourseId && uc.StartDate != null);
-    
+    bool isCourseFinished = Model.Lessons.Any(l => l.IsTheLastLesson == true);
+    var userAndCourse = Model.UsersAndCourse.Find(uc => currentUser.Id == uc.UserId && uc.CourseId == Model.Course.CourseId);
+
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -127,6 +129,15 @@
     .lessonInfo p {
         padding-top: 5px;
     }
+
+    .courseEstimation {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 </style>
 </head>
 
@@ -149,8 +160,12 @@
                         <p>Lessons:</p>
                         @if(isUserCreatedCourse || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
                         {
-                            <a asp-controller="Lesson" asp-action="Create" asp-route-courseId="@Model.Course.CourseId" 
-                                type="button" class="btn btn-sm btn-outline-secondary">+</a>
+                            if (!isCourseFinished)
+                            {
+                                <a asp-controller="Lesson" asp-action="Create" asp-route-courseId="@Model.Course.CourseId" 
+                                    type="button" class="btn btn-sm btn-outline-secondary">+</a>
+                            }
+                                
                         }
                     </div>
                     @foreach (var lesson in Model.Lessons)
@@ -185,48 +200,82 @@
 
                 @if (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString()))
                 {
-                    <div class="courseButtons">
-                        @if (!isUserRegistered)
-                        {
+                    @if (!isUserRegistered)
+                    {
+                        <div class="courseButtons">
                             <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
                                 asp-route-courseId="@Model.Course.CourseId">
                                 <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
                             </form>
+                        </div>
+                    }
+                    else 
+                    {
+                        if(userAndCourse.GeneralEstimation != null)
+                        {
+                            <div class=courseEstimation>
+                                <p>Grade for course:</p>
+                                <p>@userAndCourse.GeneralEstimation</p>
+                            </div>
+                        }
+                        else 
+                        {
+                            <div class="courseButtons">
+                                <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
+                                    asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@currentUser.Id">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                        style="background-color: #FE6C6C; margin-left: 5px">Leave this course</button>
+                                </form>
+                            </div>
+                        }
+                    }
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
+                {
+                    if (isUserCreatedCourse)
+                    {
+                        <div class="courseButtons">
+                            <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
+                                type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                            <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
+                                type="button" class="btn btn-sm btn-outline-secondary"
+                                style="background-color: #FE6C6C;">Delete this course</a>
+                        </div>
+                    }
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
+                {
+                     
+                    @if (!isUserCreatedCourse && !isUserRegistered)
+                    {
+                        <div class="courseButtons">
+                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                asp-route-courseId="@Model.Course.CourseId">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
+                                </form>
+                        </div>
+                    }
+                    else if (isUserRegistered)
+                    {
+                        if(userAndCourse.GeneralEstimation != null)
+                        {
+                            <div class=courseEstimation>
+                                <p>Grade for course:</p>
+                                <p>@userAndCourse.GeneralEstimation</p>
+                            </div>
                         }
                         else
                         {
-                            <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
-                                asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@currentUser.Id">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
-                                    style="background-color: #FE6C6C; margin-left: 5px">Leave this course</button>
-                            </form>
-                        }
-                        </div>
-                    }
-                    else if (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()))
-                    {
-                        if (isUserCreatedCourse)
-                        {
                             <div class="courseButtons">
-                                <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
-                                    type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
-                                <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
-                                    type="button" class="btn btn-sm btn-outline-secondary"
-                                    style="background-color: #FE6C6C;">Delete this course</a>
+                                <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
+                                    asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@currentUser.Id">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                        style="background-color: #FE6C6C; margin-left: 5px">Leave this course</button>
+                                </form>
                             </div>
                         }
-                }
-                    
-                else if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
-                {
-                    <div class="courseButtons"> 
-                        @if (!isUserCreatedCourse && !isUserRegistered)
-                        {
-                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
-                                asp-route-courseId="@Model.Course.CourseId">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-left: 5px">Register</button>
-                            </form>
-                        }
+                    }
+                    <div class="courseButtons">
                         <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
                             class="btn btn-sm btn-outline-secondary">Edit course info</a>
                         <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
@@ -248,29 +297,52 @@
                         }
                     </p>
                     <br>
-                    <p>Students:
-                        @foreach (var user in Model.UsersAndCourse)
-                        {
-                            @if (user.DateOfCreation == null)
+                    @if(isUserCreatedCourse || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()))
+                    {
+                        <p>Students:</p>
+                        <p>Active students:</p>
+                            @foreach (var user in Model.UsersAndCourse)
                             {
-                                <div class="user">
-                                    <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
-                                         asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
-                                    @if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()) ||
-                                        isUserCreatedCourse)
+                                @if (user.GeneralEstimation == null)
+                                {
+                                    if (user.DateOfCreation == null)
                                     {
-                                        <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
-                                            asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@user.User.Id">
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" 
-                                            style="background-color: #FE6C6C; width: 70px; height: 25px; margin-right:10px; 
-                                            display: flex; align-items: center; justify-content: center;">Remove</button>
-                                        </form>
+                                        <div class="user">
+                                            <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
+                                                asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
+                                            @if (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString()) ||
+                                               isUserCreatedCourse)
+                                            {
+                                                <form method="post" asp-controller="Course" asp-action="RemoveUserFromCourse" 
+                                                    asp-route-courseId="@Model.Course.CourseId" asp-route-userId="@user.User.Id">
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                        style="background-color: #FE6C6C; width: 70px; height: 25px; margin-right:10px; 
+                                                        display: flex; align-items: center; justify-content: center;">Remove</button>
+                                                </form>
+                                            }
+                                        </div>
                                     }
-                                </div>
+                                }
+
                             }
-                        }
-                    </p>
-            
+                        <br>
+                        <p>Students who passed the course:</p>
+                            @foreach (var user in Model.UsersAndCourse)
+                            {
+                                @if (user.GeneralEstimation != null)
+                                {
+                                    if (user.DateOfCreation == null)
+                                    {
+                                        <div class="user">
+                                            <a class="text-dark" asp-area="" asp-controller="User" asp-action="Detail"
+                                                asp-route-id="@user.User.Id">@user.User.Name @user.User.Surname</a>
+                                        </div>
+                                    }
+                                }
+
+                            }  
+                    }
+                        
                 </div>
             </div>
         </div>

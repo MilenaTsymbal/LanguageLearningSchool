@@ -35,6 +35,18 @@ namespace LanguageLearningSchool.Repositories
             return _context.UsersAndTasks.FirstOrDefault(c => c.UserAndTaskId == id);
         }
 
+        public bool AddRange(List<UserAndTask> userAndTask)
+        {
+            _context.Set<UserAndTask>().AddRange(userAndTask);
+            return Save();
+        }
+
+        public bool UpdateRange(List<UserAndTask> userAndTask)
+        {
+            _context.Set<UserAndTask>().UpdateRange(userAndTask);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

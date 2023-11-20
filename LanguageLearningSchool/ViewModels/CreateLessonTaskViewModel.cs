@@ -1,12 +1,13 @@
 ﻿using LanguageLearningSchool.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LanguageLearningSchool.ViewModels
 {
-    public class TestDetailsViewModel
+    public class CreateLessonTaskViewModel
     {
         public int LessonId { get; set; }
-        public string LessonName { get; set; }
-        public List<LessonTask> Tasks { get; set; }
+        [Required(ErrorMessage = "Task text is required")]
+        public string TaskText { get; set; }
         public List<Answer> Answers { get; set; }
     }
 }

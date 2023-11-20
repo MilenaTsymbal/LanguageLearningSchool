@@ -1,0 +1,89 @@
+﻿@using LanguageLearningSchool.Controllers;
+@using LanguageLearningSchool.Repositories;
+@using LanguageLearningSchool.ViewModels;
+@model PassTheTestViewModel
+@{
+    int numberOfTask = 1;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h5>Test for the "@Model.LessonName" lesson</h5>
+    <br>
+    <form asp-controller="LessonTask" asp-action="PassTheTest" method="post">
+        <input name="LessonName" type="hidden" value="@Model.LessonName" class="form-control">
+        <input name="LessonId" type="hidden" value="@Model.LessonId" class="form-control">
+        @for (var i = 0; i < Model.Tasks.Count; i++)
+        {
+            var task = Model.Tasks[i];
+            <input name="Tasks[@i].TaskId" type="hidden" value="@task.TaskId" class="form-control">
+            <input name="Tasks[@i].LessonId" type="hidden" value="@task.LessonId" class="form-control">
+            <div class="form-group">
+                <div id="taskTextDisplay">@numberOfTask) @task.TaskText</div>
+                <input name="Tasks[@i].TaskText" type="hidden" value="@task.TaskText" />
+                <span asp-validation-for="Tasks[@i].TaskText" class="text-danger"></span>
+            </div>
+            <table class="table">
+                <tbody>
+                    @for (var j = 0; j < Model.Answers.Count; j++)
+                    {
+                        var answer = Model.Answers[j];
+                        if (answer.TaskId == task.TaskId)
+                        {
+                            <tr>
+                                <td style="width: 90px;">
+                                    <input name="Answers[@j].AnswerId" type="hidden" value="@answer.AnswerId"
+                                        class="form-control">
+                                    <input name="Answers[@j].AnswerName" type="hidden" value="@answer.AnswerName"
+                                        class="form-control" />
+                                    <div class="form-control" id="taskTextDisplay">@answer.AnswerName</div>
+                                    <span asp-validation-for="Answers[@j].AnswerName" class="text-danger"></span>
+                                </td>
+                                <td style="width: 10px;">
+                                    <input name="UserAndTasks[@i].UserAndTaskId" type="hidden" value="UserAndTaskId"
+                                        class="form-control">
+                                    <input name="UserAndTasks[@i].TaskId" type="hidden" value="@task.TaskId"
+                                        class="form-control">
+                                    <input name="UserAndTasks[@i].UserId" type="hidden" value="UserId"
+                                        class="form-control">
+                                    <input name="UserAndTasks[@i].UserAnswer" type="checkbox" value="true"
+                                           class="answer-checkbox" data-answer-correct="@answer.Correctness" />
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            numberOfTask++;
+        }
+        <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-top: 15px">Send
+            answers</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var checkboxes = document.querySelectorAll('.answer-checkbox');
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    var isChecked = this.checked;
+                    var correctAnswer = this.getAttribute('data-answer-correct') === 'True';
+
+                    this.closest('tr').querySelector('[name^="UserAndTasks["][name$="].UserAnswer"]').value =
+                        (isChecked && correctAnswer) || (!isChecked && !correctAnswer);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

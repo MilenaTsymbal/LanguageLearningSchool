@@ -17,6 +17,11 @@
             id="exampleFormControlTextarea1" rows="3" placeholder="Enter the material"></textarea>
         <span asp-validation-for="@Model.Material" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="@Model.IsTheLastLesson">Is the last lesson?</label>
+        <input asp-for="@Model.IsTheLastLesson" type="checkbox" />
+        <span asp-validation-for="@Model.IsTheLastLesson" class="text-danger"></span>
+    </div>
 
     <button type="submit" class="btn btn-sm btn-outline-secondary" style="margin-top: 15px">Create</button>
 </form>

@@ -1,0 +1,13 @@
+﻿@model LessonTask
+
+<h5>Are you sure you want to delete "@Model.TaskText" task?</h5>
+<div class="form-group">
+    <form method="post" asp-controller="LessonTask" asp-action="Delete" asp-route-taskId="@Model.TaskId" 
+        asp-route-lessonId="@Model.LessonId">
+        <div class="btn-group">
+            <input type="submit" value="Confirm" class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;"/>
+            <a class="btn btn-sm btn-outline-secondary" asp-controller="LessonTask" asp-action="TestDetail"
+                asp-route-lessonId="@Model.LessonId">Cancel</a>
+        </div>
+    </form>
+</div>

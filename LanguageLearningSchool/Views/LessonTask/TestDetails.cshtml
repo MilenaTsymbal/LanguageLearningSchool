@@ -16,21 +16,29 @@
             align-items: center;
             margin-bottom: 10px;
         }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h5>Test details for the "@Model.LessonName" lesson</h5>
+        <div class="taskInfo">
+            <h5>Test details for the "@Model.LessonName" lesson</h5>
+            <a asp-area="" asp-controller="LessonTask" asp-action="Create" asp-route-lessonId="@Model.LessonId" method="get" style="width: 25px; 
+                height: 25px; display: flex; justify-content: center; align-items: center;" 
+                class="btn btn-sm btn-outline-secondary">+</a>
+        </div>
+        <br>
         @foreach(var task in Model.Tasks)
         {
             <div class="taskAndAnswers">
                 <div class="taskInfo"> 
                     <h6>@task.TaskText</h6>
                     <div>
-                            <a asp-area="" asp-controller="LessonTask" asp-action="Edit" asp-route-taskId="@task.TaskId" method="get" 
-                                style="width: 140px; margin-left: 10px;" class="btn btn-sm btn-outline-secondary">
-                                Edit this task</a>
-                            <a asp-area="" method="get" style="background-color: #FE6C6C; width: 140px;" 
+                        <a asp-area="" asp-controller="LessonTask" asp-action="Edit" asp-route-taskId="@task.TaskId" method="get" 
+                            style="width: 140px; margin-left: 10px;" class="btn btn-sm btn-outline-secondary">
+                            Edit this task</a>
+                            <a asp-area="" asp-controller="LessonTask" asp-action="Delete" asp-route-taskId="@task.TaskId"
+                            method="get" style="background-color: #FE6C6C; width: 140px;" 
                             class="btn btn-sm btn-outline-secondary">Delete this task</a>
                     </div>
                 </div>

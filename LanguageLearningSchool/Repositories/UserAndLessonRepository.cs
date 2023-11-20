@@ -42,6 +42,11 @@ namespace LanguageLearningSchool.Repositories
                 .Where(ual => ual.Lesson.CourseId == courseId).ToList();
         }
 
+        public IQueryable<UserAndLesson> GetAllLessonsUserLearning()
+        {
+            return _context.UsersAndLessons.Include(ul => ul.Lesson);
+        }
+
         public bool DeleteRange(List<UserAndLesson> userAndLesson)
         {
             _context.Set<UserAndLesson>().RemoveRange(userAndLesson);

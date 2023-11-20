@@ -177,16 +177,34 @@
                 {
                     if (isUserRegistered)
                     {
-                        <div class=lessonEstimation>
-                            <p>Grade:</p>
-                            <p>LessonEstimation</p>
-                        </div>
-                        <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
-                            align-items: center; margin-bottom: 10px;">
-                            <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
-                                width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
-                            
-                        </div>
+                        if (Model.UserAndLesson.LessonEstimation == null)
+                        {
+                            if(Model.Tasks.Count != 0)
+                            {
+                                <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                                    align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                                    <a asp-area="" asp-controller="LessonTask" asp-action="PassTheTest" 
+                                        asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-bottom: 10px; width: 140px;" 
+                                        class="btn btn-sm btn-outline-secondary">Pass the test</a>
+                                </div>
+                            }
+                        }
+                        else if (Model.UserAndLesson.LessonEstimation > 60)
+                        {
+                            <div class=lessonEstimation>
+                                <p>Grade:</p>
+                                <p>@Model.UserAndLesson.LessonEstimation</p>
+                            </div>
+                        }
+                        else if (Model.UserAndLesson.LessonEstimation < 60)
+                        {
+                            <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                                align-items: center; margin-bottom: 10px;">
+                                <a asp-area="" asp-controller="LessonTask" asp-action="PassTheTest" 
+                                    asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-top:10px; margin-bottom: 10px; width: 140px;" 
+                                    class="btn btn-sm btn-outline-secondary">Pass the test again</a>
+                            </div>
+                        }
                         
                     }
                         <div style="display: flex; flex-direction: column; justify-content: center;
@@ -199,20 +217,42 @@
                             <a asp-controller="Lesson" asp-action="Delete" asp-route-lessonId="@Model.Lesson.LessonId"
                                 type="button" class="btn btn-sm btn-outline-secondary"
                                 style="background-color: #FE6C6C; margin-bottom: 10px; width: 140px;">Delete this lesson</a>
-                        </div>
+                    </div>
 
                 }
                 else
                 {
-                    <div class=lessonEstimation>
-                        <p>Grade:</p>
-                        <p>LessonEstimation</p>
-                    </div>
-                    <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
-                        align-items: center; margin-bottom: 10px;">
-                        <a asp-area="" asp-controller="Account" asp-action="LogOut" method="get" style="margin-bottom: 10px; 
-                            width: 140px;" class="btn btn-sm btn-outline-secondary">Pass the test</a>
-                    </div>
+                    if (isUserRegistered)
+                    {
+                        if (Model.UserAndLesson.LessonEstimation == null)
+                        {
+                            if(Model.Tasks.Count != 0)
+                            {
+                                <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                                    align-items: center; margin-bottom: 10px; margin-top: 10px;">
+                                    <a asp-area="" asp-controller="LessonTask" asp-action="PassTheTest" 
+                                        asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-bottom: 10px; width: 140px;" 
+                                        class="btn btn-sm btn-outline-secondary">Pass the test</a>
+                                </div>
+                            }
+                        }
+                        else if (Model.UserAndLesson.LessonEstimation > 60)
+                        {
+                            <div class=lessonEstimation>
+                                <p>Grade:</p>
+                                <p>@Model.UserAndLesson.LessonEstimation</p>
+                            </div>
+                        }
+                        else if (Model.UserAndLesson.LessonEstimation < 60)
+                        {
+                            <div class="border-bottom" style="display: flex; flex-direction: column; justify-content: center;
+                                align-items: center; margin-bottom: 10px;">
+                                <a asp-area="" asp-controller="LessonTask" asp-action="PassTheTest" 
+                                    asp-route-lessonId="@Model.Lesson.LessonId" method="get" style="margin-top:10px; margin-bottom: 10px; width: 140px;" 
+                                    class="btn btn-sm btn-outline-secondary">Pass the test again</a>
+                            </div>
+                        }
+                    }
                 }
 
         </div>

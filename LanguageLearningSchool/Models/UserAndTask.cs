@@ -13,6 +13,6 @@ namespace LanguageLearningSchool.Models
         [ForeignKey("LessonTask")]
         public int TaskId { get; set; }
         public LessonTask Task { get; set; }
-        public string UserAnswer { get; set; }
+        public bool UserAnswer { get; set; }
     }
 }

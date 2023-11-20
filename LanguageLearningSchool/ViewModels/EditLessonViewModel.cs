@@ -10,5 +10,6 @@ namespace LanguageLearningSchool.ViewModels
         public int CourseId { get; set; }
         public string LessonName { get; set; }
         public string Material { get; set; }
+        public bool IsTheLastLesson { get; set; }
     }
 }

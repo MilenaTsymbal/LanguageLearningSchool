@@ -37,7 +37,7 @@ namespace LanguageLearningSchool.Controllers
             var lesson = _lessonRepository.GetById(lessonId);
             var userIsLearning = _userAndLessonRepository.GetAll()
                 .FirstOrDefault(item => item.UserId == userId && item.LessonId == lessonId);
-
+            var tasks = _lessonTaskRepository.GetAll().Where(lt => lt.LessonId == lessonId).ToList();
             if (userIsLearning == null)
             {
                 var userAndLesson = new UserAndLesson
@@ -47,7 +47,8 @@ namespace LanguageLearningSchool.Controllers
                 };
                 _userAndLessonRepository.Add(userAndLesson);
             }
-            
+            userIsLearning = _userAndLessonRepository.GetAll()
+                .FirstOrDefault(item => item.UserId == userId && item.LessonId == lessonId);
             var course = _courseRepository.GetById(courseId);
             var usersAndCourse = _userAndCourseRepository.GetAll().FindAll(item => item.CourseId == courseId).ToList();
 
@@ -55,7 +56,9 @@ namespace LanguageLearningSchool.Controllers
             {
                 Lesson = lesson,
                 Course = course,
-                UsersAndCourse = usersAndCourse
+                UsersAndCourse = usersAndCourse,
+                UserAndLesson = userIsLearning,
+                Tasks = tasks
             };
 
             return View(lessonInfo);
@@ -84,7 +87,8 @@ namespace LanguageLearningSchool.Controllers
             {
                 CourseId = lessonViewModel.CourseId,
                 LessonName = lessonViewModel.LessonName,
-                Material = lessonViewModel.Material
+                Material = lessonViewModel.Material,
+                IsTheLastLesson = lessonViewModel.IsTheLastLesson
             };
 
             _lessonRepository.Add(lesson);
@@ -116,7 +120,8 @@ namespace LanguageLearningSchool.Controllers
                 CourseId = lesson.CourseId,
                 LessonId = lesson.LessonId,
                 LessonName = lesson.LessonName,
-                Material = lesson.Material
+                Material = lesson.Material,
+                IsTheLastLesson = lesson.IsTheLastLesson
             };
 
             return View(lessonViewModel);
@@ -139,6 +144,7 @@ namespace LanguageLearningSchool.Controllers
                 lesson.CourseId = lessonViewModel.CourseId;
                 lesson.LessonName = lessonViewModel.LessonName;
                 lesson.Material = lessonViewModel.Material;
+                lesson.IsTheLastLesson = lessonViewModel.IsTheLastLesson;
 
                 _lessonRepository.Update(lesson);
 

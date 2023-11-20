@@ -35,6 +35,11 @@ namespace LanguageLearningSchool.Repositories
             return _context.Lessons.FirstOrDefault(c => c.LessonId == id);
         }
 
+        public bool DeleteRange(List<Lesson> lessons)
+        {
+            _context.Set<Lesson>().RemoveRange(lessons);
+            return Save();
+        }
         public bool Save()
         {
             var saved = _context.SaveChanges();
