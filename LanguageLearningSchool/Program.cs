@@ -17,6 +17,7 @@ builder.Services.AddScoped<ILessonTaskRepository, LessonTaskRepository>();
 builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
 builder.Services.AddScoped<IUserAndLessonRepository, UserAndLessonRepository>();
 builder.Services.AddScoped<IUserAndTaskRepository, UserAndTaskRepository>();
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

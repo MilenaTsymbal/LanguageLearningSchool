@@ -299,6 +299,14 @@
                         <a asp-controller="User" asp-action="Delete" asp-route-id="@Model.User.Id" 
                             class="btn btn-sm btn-outline-secondary" style="background-color: #FE6C6C;">
                             Delete this account</a>
+                            @if(await UserManager.IsInRoleAsync(@Model.User, Roles.Admin.ToString()) ||
+                                await UserManager.IsInRoleAsync(@Model.User, Roles.Teacher.ToString()))
+                            {
+                                <form method="post" asp-controller="Course" asp-action="GenerateCoursesDataReport">
+                                    <button style="margin-top: 10px; width: 140px;" type="submit" class="btn btn-sm btn-outline-secondary">Report of courses</button>
+                                </form>
+                            }
+                        
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ namespace LanguageLearningSchool.Interfaces
         UserAndCourse? GetById(int id);
         bool Add(UserAndCourse userAndCourse);
         bool Delete(UserAndCourse userAndCourse);
+        bool DeleteRange(List<UserAndCourse> userAndCourse);
         public UserAndCourse FirstOrDefault(Expression<Func<UserAndCourse, bool>> predicate);
         bool Update(UserAndCourse userAndCourse);
         bool Save();

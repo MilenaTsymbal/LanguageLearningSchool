@@ -47,6 +47,12 @@ namespace LanguageLearningSchool.Repositories
             return Save();
         }
 
+        public bool DeleteRange(List<UserAndTask> userAndTask)
+        {
+            _context.Set<UserAndTask>().RemoveRange(userAndTask);
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();

@@ -1,4 +1,4 @@
-﻿@using LanguageLearningSchool.ViewModels;
+﻿@*@using LanguageLearningSchool.ViewModels;
 @model EditTaskViewModel
 
 <!DOCTYPE html>
@@ -45,6 +45,48 @@
         </tbody>
     </table>
 </div>
+        <button type="submit" class="btn btn-sm btn-outline-secondary">Save Changes</button>
+    </form>
+</body>
+</html>*@
+@using LanguageLearningSchool.ViewModels;
+@model EditTaskViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <form asp-controller="LessonTask" asp-action="Edit" method="post">
+        <input asp-for="Task.TaskId" type="hidden" class="form-control">
+        <input asp-for="Task.LessonId" type="hidden" class="form-control">
+        <div class="form-group">
+            <label asp-for="Task.TaskText">Task text</label>
+            <input asp-for="Task.TaskText" class="form-control" />
+            <span asp-validation-for="Task.TaskText" class="text-danger"></span>
+        </div>
+        <br>
+        <div class="form-group">
+            <label asp-for="Answers">Answers</label>
+            @for (int i = 0; i < Model.Answers.Count; i++)
+            {
+                var answer = Model.Answers[i];
+                <input asp-for="Answers[i].AnswerId" type="hidden" class="form-control">
+                <input asp-for="Answers[i].AnswerName" class="form-control" style="margin-bottom: 10px;" />
+                <span asp-validation-for="Answers[i].AnswerName" class="text-danger"></span>
+            }
+        </div>
+        <br>
+        <p>Choose the correct answer:</p>
+        <select asp-for="SelectedCorrectAnswer" class="form-select" id="answerSelect" style="margin-bottom: 10px;">
+            @foreach (var answer in Model.Answers)
+            {
+                <option value="@answer.AnswerName">@answer.AnswerName</option>
+            }
+        </select>
         <button type="submit" class="btn btn-sm btn-outline-secondary">Save Changes</button>
     </form>
 </body>

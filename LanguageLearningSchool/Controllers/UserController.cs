@@ -13,22 +13,32 @@ namespace LanguageLearningSchool.Controllers
 {
     public class UserController : Controller
     {
+        public readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly ICourseRepository _courseRepository;
+        private readonly IUserAndCourseRepository _userAndCourseRepository;
+        private readonly IUserAndTaskRepository _userAndTaskRepository;
+        private readonly IUserAndLessonRepository _userAndLessonRepository;
+        private readonly ILessonTaskRepository _lessonTaskRepository;
+        private readonly ILessonRepository _lessonRepository;
         public UserController(IUserRepository userRepository, UserManager<User> userManager,
             SignInManager<User> signInManager, ICourseRepository courseRepository, 
-            IUserAndCourseRepository userAndCourseRepository)
+            IUserAndCourseRepository userAndCourseRepository, IUserAndTaskRepository userAndTaskRepository,
+            IUserAndLessonRepository userAndLessonRepository, ILessonTaskRepository lessonTaskRepository,
+            ILessonRepository lessonRepository)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _signInManager = signInManager;
             _courseRepository = courseRepository;
             _userAndCourseRepository = userAndCourseRepository;
+            _userAndTaskRepository = userAndTaskRepository;
+            _userAndLessonRepository = userAndLessonRepository;
+            _lessonTaskRepository = lessonTaskRepository;
+            _lessonRepository = lessonRepository;
         }
-        public readonly IUserRepository _userRepository;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ICourseRepository _courseRepository;
-        private readonly IUserAndCourseRepository _userAndCourseRepository;
-
+        
         public IActionResult Index()
         {
             List<User> users = _userRepository.GetAll();
@@ -138,6 +148,15 @@ namespace LanguageLearningSchool.Controllers
 
             if (user == null) return View("Error");
 
+            var userAndTask = _userAndTaskRepository.GetAll().Where(ut => ut.UserId == user.Id).ToList();
+            _userAndTaskRepository.DeleteRange(userAndTask);
+
+            var userAndLessonTask = _userAndLessonRepository.GetAll().Where(ut => ut.UserId == user.Id).ToList();
+            _userAndLessonRepository.DeleteRange(userAndLessonTask);
+
+            var userAndCourse = _userAndCourseRepository.GetAll().Where(ut => ut.UserId == user.Id).ToList();
+            _userAndCourseRepository.DeleteRange(userAndCourse);
+
             _userRepository.Delete(user);
 
             await _signInManager.SignOutAsync();
@@ -162,10 +181,29 @@ namespace LanguageLearningSchool.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
+            var lessonsForCourse = _lessonRepository.GetAll().Where(lesson => lesson.CourseId == courseId).ToList();
+            var tasksForCourse = _lessonTaskRepository
+                .GetAll()
+                .Where(task => lessonsForCourse
+                .Select(lesson => lesson.LessonId).Contains(task.LessonId))
+                .ToList();
+
+            var userAndTasksForCourse = _userAndTaskRepository
+                .GetAll()
+                .Where(userAndTask => tasksForCourse.Select(task => task.TaskId).Contains(userAndTask.TaskId)
+                && userAndTask.UserId == userId)
+                .ToList();
+            _userAndTaskRepository.DeleteRange(userAndTasksForCourse);
+
+            var userAndLessonsForCourse = _userAndLessonRepository
+                .GetAll()
+                .Where(userAndLesson => lessonsForCourse.Select(lesson => lesson.LessonId).Contains(userAndLesson.LessonId)
+                && userAndLesson.UserId == userId)
+                .ToList();
+            _userAndLessonRepository.DeleteRange(userAndLessonsForCourse);
+            
             var userAndCourse = _userAndCourseRepository.GetAll().Find(item => item.UserId == userId && item.CourseId == courseId);
-
             _userAndCourseRepository.Delete(userAndCourse);
-
 
             var user = _userRepository.GetById(userId);
 
@@ -183,35 +221,5 @@ namespace LanguageLearningSchool.Controllers
 
             return View("Error");
         }
-        //public IActionResult LeaveCourse(int courseId)
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        //    return View();
-        //}
-        //[HttpPost, ActionName("LeaveCourse")]
-        //public IActionResult LeaveCourse(int courseId)
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        //    var userAndCourse = _userAndCourseRepository.GetAll().Find(item => item.UserId == userId && item.CourseId == courseId);
-        //    _userAndCourseRepository.Delete(userAndCourse);
-
-        //    var user = _userRepository.GetById(userId);
-
-        //    if (user != null)
-        //    {
-        //        var userAndCourses = _userAndCourseRepository.GetAll().Where(item => item.UserId == user.Id).ToList();
-        //        var model = new UserDetailViewModel
-        //        {
-        //            User = user,
-        //            UserAndCourses = userAndCourses
-        //        };
-
-        //        return View("UserDeatil", model);
-        //    }
-
-        //    return View("Error");
-        //}
     }
 }

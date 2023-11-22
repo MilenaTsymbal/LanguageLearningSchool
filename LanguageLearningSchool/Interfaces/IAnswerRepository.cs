@@ -4,6 +4,7 @@ namespace LanguageLearningSchool.Interfaces
 {
     public interface IAnswerRepository
     {
+        List<Answer> GetAll();
         List<Answer> GetAllAnswersOfLesson(int lessonId);
         List<Answer> GetAllAnswersOfTask(int taskId);
         bool UpdateRange(List<Answer> answers);

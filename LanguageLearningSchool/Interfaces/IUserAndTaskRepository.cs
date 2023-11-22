@@ -8,6 +8,7 @@ namespace LanguageLearningSchool.Interfaces
         UserAndTask GetById(int id);
         bool AddRange(List<UserAndTask> userAndTask);
         bool UpdateRange(List<UserAndTask> userAndTask);
+        bool DeleteRange(List<UserAndTask> userAndTask);
         bool Add(UserAndTask userAndTask);
         bool Delete(UserAndTask userAndTask);
         bool Update(UserAndTask userAndTask);

@@ -6,5 +6,6 @@ namespace LanguageLearningSchool.ViewModels
     {
         public string? InquiryText { get; set; }
         public DataTable? Output { get; set; }
+        public string? SpecificQuery { get; set; }
     }
 }

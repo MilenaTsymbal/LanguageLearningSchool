@@ -1,7 +1,9 @@
-﻿using LanguageLearningSchool.Interfaces;
+﻿using LanguageLearningSchool.Enums;
+using LanguageLearningSchool.Interfaces;
 using LanguageLearningSchool.Models;
 using LanguageLearningSchool.Repositories;
 using LanguageLearningSchool.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -14,16 +16,24 @@ namespace LanguageLearningSchool.Controllers
         private readonly IUserAndCourseRepository _userAndCourseRepository;
         private readonly IUserAndLessonRepository _userAndLessonRepository;
         private readonly ILessonTaskRepository _lessonTaskRepository;
+        private readonly IAnswerRepository _answerRepository;
+        private readonly IUserAndTaskRepository _userAndTaskRepository;
+        public readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
 
         public LessonController(ILessonRepository lessonRepository, ICourseRepository courseRepository, 
             IUserAndCourseRepository userAndCourseRepository, IUserAndLessonRepository userAndLessonRepository,
-            ILessonTaskRepository lessonTaskRepository)
+            ILessonTaskRepository lessonTaskRepository, IAnswerRepository answerRepository, 
+            IUserAndTaskRepository userAndTaskRepository, IUserRepository userRepository, UserManager<User> userManager)
         {
             _lessonRepository = lessonRepository;
             _courseRepository = courseRepository;
             _userAndCourseRepository = userAndCourseRepository;
             _userAndLessonRepository = userAndLessonRepository;
             _lessonTaskRepository = lessonTaskRepository;
+            _answerRepository = answerRepository;            _userAndTaskRepository = userAndTaskRepository;
+            _userRepository = userRepository;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -34,19 +44,25 @@ namespace LanguageLearningSchool.Controllers
         public IActionResult Detail(int lessonId, int courseId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var user = _userRepository.GetAll().Find(u => u.Id == userId);
+
             var lesson = _lessonRepository.GetById(lessonId);
             var userIsLearning = _userAndLessonRepository.GetAll()
                 .FirstOrDefault(item => item.UserId == userId && item.LessonId == lessonId);
             var tasks = _lessonTaskRepository.GetAll().Where(lt => lt.LessonId == lessonId).ToList();
-            if (userIsLearning == null)
+            if(user.UserRole != Roles.Teacher)
             {
-                var userAndLesson = new UserAndLesson
+                if (userIsLearning == null)
                 {
-                    UserId = userId,
-                    LessonId = lessonId
-                };
-                _userAndLessonRepository.Add(userAndLesson);
+                    var userAndLesson = new UserAndLesson
+                    {
+                        UserId = userId,
+                        LessonId = lessonId
+                    };
+                    _userAndLessonRepository.Add(userAndLesson);
+                }
             }
+            
             userIsLearning = _userAndLessonRepository.GetAll()
                 .FirstOrDefault(item => item.UserId == userId && item.LessonId == lessonId);
             var course = _courseRepository.GetById(courseId);
@@ -170,16 +186,34 @@ namespace LanguageLearningSchool.Controllers
         public IActionResult DeleteLesson(int lessonId)
         {
             var lesson = _lessonRepository.GetById(lessonId);
-            var courseId = lesson.CourseId;
+            var courseId = lesson?.CourseId; // Use null conditional operator to handle lesson being null
             if (lesson == null) return View("Error");
 
-            var userAndLesson = _userAndLessonRepository.GetAll().FindAll(ul => ul.LessonId == lessonId);
+            var allAnswersForLesson = _answerRepository.GetAllAnswersOfLesson(lessonId);
 
-            var userAndLessonsToDelete = _userAndLessonRepository.GetAll().Where(ul => ul.LessonId == lessonId).ToList();
-            _userAndLessonRepository.DeleteRange(userAndLessonsToDelete);
+            // Use null conditional operator to handle potential null Task properties
+            var userAndTasksForLesson = _userAndTaskRepository.GetAll()
+                .Where(userAndTask => userAndTask.Task?.LessonId == lessonId).ToList();
 
-            var lessonTasksToDelete = _lessonTaskRepository.GetAll().Where(lt => lt.LessonId == lessonId).ToList();
-            _lessonTaskRepository.DeleteRange(lessonTasksToDelete);
+            var lessonTasks = _lessonTaskRepository.GetAll().Where(lt => lt.LessonId == lessonId).ToList();
+            var userAndLessons = _userAndLessonRepository.GetAll().Where(ul => ul.LessonId == lessonId).ToList();
+
+            if (allAnswersForLesson != null && allAnswersForLesson.Any())
+            {
+                _answerRepository.DeleteRange(allAnswersForLesson);
+            }
+            if (userAndTasksForLesson != null && userAndTasksForLesson.Any())
+            {
+                _userAndTaskRepository.DeleteRange(userAndTasksForLesson);
+            }
+            if (lessonTasks != null && lessonTasks.Any())
+            {
+                _lessonTaskRepository.DeleteRange(lessonTasks);
+            }
+            if (userAndLessons != null && userAndLessons.Any())
+            {
+                _userAndLessonRepository.DeleteRange(userAndLessons);
+            }
 
             _lessonRepository.Delete(lesson);
 

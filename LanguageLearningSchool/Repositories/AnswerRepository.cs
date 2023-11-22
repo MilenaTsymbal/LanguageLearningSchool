@@ -26,6 +26,11 @@ namespace LanguageLearningSchool.Repositories
             return Save();
         }
 
+        public List<Answer> GetAll()
+        {
+            return _context.Answers.ToList();
+        }
+
         public List<Answer> GetAllAnswersOfLesson(int lessonId)
         {
             return _context.Answers.Where(a => _context.LessonTasks.Any(lt => lt.LessonId == lessonId && lt.TaskId == a.TaskId))

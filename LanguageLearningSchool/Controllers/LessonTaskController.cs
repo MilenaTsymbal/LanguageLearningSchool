@@ -92,6 +92,7 @@ namespace LanguageLearningSchool.Controllers
                 foreach (var answer in taskViewModel.Answers)
                 {
                     answer.TaskId = task.TaskId;
+                    answer.Correctness = answer.AnswerName == taskViewModel.SelectedCorrectAnswer;
                 }
 
                 _answerRepository.UpdateRange(taskViewModel.Answers);

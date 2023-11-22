@@ -6,5 +6,6 @@ namespace LanguageLearningSchool.ViewModels
     {
         public LessonTask Task { get; set; }
         public List<Answer> Answers { get; set; }
+        public string SelectedCorrectAnswer { get; set; }
     }
 }

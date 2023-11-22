@@ -27,6 +27,12 @@ namespace LanguageLearningSchool.Repositories
             return Save();
         }
 
+        public bool DeleteRange(List<UserAndCourse> userAndCourse)
+        {
+            _context.Set<UserAndCourse>().RemoveRange(userAndCourse);
+            return Save();
+        }
+
         public List<UserAndCourse> GetAll()
         {
             return _context.UsersAndCourses.Include(uc => uc.Course).Include(uc => uc.User).ToList();

@@ -178,6 +178,12 @@
                                     asp-route-courseId="@Model.Course.CourseId" type="button"
                                     class="btn btn-sm btn-outline-secondary" style="width:140px;">Continue learning</a>
                             }
+                            else if(isUserCreatedCourse)
+                            {
+                                <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId"
+                                    asp-route-courseId="@Model.Course.CourseId" type="button"
+                                    class="btn btn-sm btn-outline-secondary" style="width:140px;">View the lesson</a>
+                            }
                             else
                             {
                                 <a asp-controller="Lesson" asp-action="Detail" asp-route-lessonId="@lesson.LessonId"
@@ -237,6 +243,10 @@
                         <div class="courseButtons">
                             <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
                                 type="button" class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                            <form method="post" asp-controller="Course" asp-action="GenerateCourseReport">
+                                <input name="courseId" value="@Model.Course.CourseId" type="hidden"></input>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Report of course</button>
+                            </form>
                             <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
                                 type="button" class="btn btn-sm btn-outline-secondary"
                                 style="background-color: #FE6C6C;">Delete this course</a>
@@ -278,6 +288,10 @@
                     <div class="courseButtons">
                         <a asp-controller="Course" asp-action="Edit" asp-route-id="@Model.Course.CourseId"
                             class="btn btn-sm btn-outline-secondary">Edit course info</a>
+                            <form method="post" asp-controller="Course" asp-action="GenerateCourseReport">
+                                    <input name="courseId" value="@Model.Course.CourseId" type="hidden"></input>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Report of course</button>
+                                </form>
                         <a asp-controller="Course" asp-action="Delete" asp-route-id="@Model.Course.CourseId"
                             type="button" class="btn btn-sm btn-outline-secondary"
                             style="background-color: #FE6C6C;">Delete this course</a>

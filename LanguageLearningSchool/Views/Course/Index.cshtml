@@ -4,7 +4,7 @@
 @inject UserManager<User> UserManager
 @model CourseIndexViewModel
 @{
-    var currentUser = await UserManager.GetUserAsync(User); 
+    var currentUser = await UserManager.GetUserAsync(User);
 
     var LanguageColour = new Dictionary<Languages, string>
     {
@@ -27,84 +27,154 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        main {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-md-3" style="margin-top: 48px;">
+                <form method="get" asp-controller="Course" asp-action="FilteredIndex">
+                    <div class="input-group" style="margin-bottom: 15px; width: 100%;">
+                        <input asp-for="SearchQuery" type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                        <button type="submit" class="btn btn-outline-secondary">Search</button>
+                    </div>
+                    <p style="margin-bottom: 10px;">Filter By:</p>
+                    <div class="filter-group">
+                        <select asp-for="LanguageFilter" id="languageFilter" class="form-select" style="margin-bottom: 10px;">
+                            <option value="">--All Languages--</option>
+                            @foreach (var languageValue in Enum.GetValues(typeof(Languages)))
+                            {
+                                var languageName = Enum.GetName(typeof(Languages), languageValue);
+                                <option value="@languageValue">@languageName</option>
+                            }
+                        </select>
+                    </div>
 
-    <main>
-        <div class="album py-5">
-            <div class="container">
+                    <div class="filter-group">
+                        <select asp-for="DifficultyLevelFilter" id="difficultyFilter" class="form-select" style="margin-bottom: 10px;">
+                            <option value="">--All Difficulties--</option>
+                            @foreach (var difficultyValue in Enum.GetValues(typeof(DifficultyLevels)))
+                            {
+                                var difficultyName = Enum.GetName(typeof(DifficultyLevels), difficultyValue);
+                                <option value="@difficultyValue">@difficultyName</option>
+                            }
+                        </select>       
+                    </div>
+                    <p style="margin-bottom: 10px;">Sort By:</p>
+                    <div class="filter-group">
+                        <select asp-for="AlphabeticalOrder" style="margin-bottom: 10px;" id="sortOrder" class="form-select">
+                            <option value="">--Alphabetical Order--</option>
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select asp-for="DateOfCreationOrder" id="sortOrder" class="form-select">
+                            <option value="">--Date Of Creation Order--</option>
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-outline-secondary" type="submit" style="display:flex; justify-content: center; align-items: center;
+                        margin-top: 10px; width: 120px; height: 30px;">Apply</button>
+                </form>
+            </aside>
+            <main class="col-md-9">
+                
                 @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Teacher.ToString()) 
                     || await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
                 {
-                    <div style="float:right; width: 40px; font-size: 14px">
-                        <a asp-controller="Course" asp-action="Create" type="button" class="btn btn-secondary btn-sm" >+</a>
+                    <div style="width: 100%;">
+                        <a asp-controller="Course" asp-action="Create" type="button"
+                        class="btn btn-outline-secondary d-flex justify-content-center align-items-center"
+                        style="float: right; width: 30px; height: 30px; font-size: 14px; padding: 0;">
+                        +
+                        </a>
                     </div>
                 }
-                
-                <div class="row">
-                    @foreach(var item in Model.Courses)
-                    {
-                        var currentColour = LanguageColour[item.Language];
-                        <div class="col-md-4">
-                            <div class="card mb-4 box-shadow">
-                                <div class="card-img-top"
-                                    data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
-                                    style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: 
-                                    center; background-color: @currentColour" data-holder-rendered="true">
-                                        <h5>@item.CourseName</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">@item.Description</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group">
-                                            <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
-                                                type="button" class="btn btn-sm btn-outline-secondary">View</a>
 
-                                            @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString())))
-                                            {
-                                                bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId && uc.StartDate != null);
-                                                if (!isUserRegistered)
-                                                {
-                                                <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
-                                                    asp-route-courseId="@item.CourseId">
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
-                                                        style="margin-left: 5px">Register</button>
-                                                </form>
-                                                }
+                <div class="album py-5">
+                    <div class="row">
+                        @if(Model.Courses == null)
+                        {
+                            <p>No courses are found</p>
+                        }
+                        @foreach(var item in Model.Courses)
+                        {
+                            var currentColour = LanguageColour[item.Language];
+                            <div class="col-md-4">
+                                <div class="card mb-4 box-shadow">
+                                    <div class="card-img-top"
+                                        data-src="holder.js/100px225?theme=thumb&amp;bg=55595c&amp;fg=eceeef&amp;text=CourseName"
+                                        style="height: 225px; width: 100%; display: flex; justify-content: center; align-items: 
+                                        center; background-color: @currentColour" data-holder-rendered="true">
+                                                <h5>@item.CourseName</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text">@item.Description</p>
+                                            @{
+                                                var dateofCreation = Model.UserCreatorsOfCourses?.Find(uc => uc.CourseId == item.CourseId);
+                                                var dateText = dateofCreation != null ? dateofCreation.DateOfCreation.ToString() : "Not Available";
                                             }
-                                            else if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
-                                            {
-                                                bool isUserCreatedCourse = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId &&
-                                                uc.UserId == currentUser.Id && uc.DateOfCreation != null);
-                                                if (!isUserCreatedCourse)
+                                            <p class="card-text">Date of creation:<br>@dateText</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="btn-group">
+                                                    <a asp-controller="Course" asp-action="Detail" asp-route-id="@item.CourseId" 
+                                                        type="button" class="btn btn-sm btn-outline-secondary">View</a>
+
+                                                @if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Student.ToString())))
                                                 {
-                                                    foreach (var user in Model.UserAndCourses)
+                                                    bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId && uc.StartDate != null);
+                                                    if (!isUserRegistered)
                                                     {
-                                                        bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId 
-                                                        && uc.UserId == user.UserId && uc.StartDate != null);
-                                                        if (!isUserRegistered)
+                                                                <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                                        asp-route-courseId="@item.CourseId">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                                        style="margin-left: 5px">Register</button>
+                                                                </form>
+                                                    }
+                                                }
+                                                else if (currentUser != null && (await UserManager.IsInRoleAsync(currentUser, Roles.Admin.ToString())))
+                                                {
+                                                    bool isUserCreatedCourse = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId &&
+                                                    uc.UserId == currentUser.Id && uc.DateOfCreation != null);
+                                                    if (!isUserCreatedCourse)
+                                                    {
+                                                        foreach (var user in Model.UserAndCourses)
                                                         {
-                                                            <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
-                                                                asp-route-courseId="@item.CourseId">
-                                                                <button type="submit" class="btn btn-sm btn-outline-secondary" 
-                                                                    style="margin-left: 5px">Register</button>
-                                                            </form>
-                                                            break;
+                                                            bool isUserRegistered = Model.UserAndCourses.Any(uc => uc.CourseId == item.CourseId
+                                                                && uc.UserId == user.UserId && uc.StartDate != null);
+                                                            if (!isUserRegistered)
+                                                            {
+                                                                                    <form method="post" asp-controller="Course" asp-action="AddUserToCourse" 
+                                                                    asp-route-courseId="@item.CourseId">
+                                                                                        <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                                                            style="margin-left: 5px">Register</button>
+                                                                                    </form>
+                                                                break;
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    }
-            </div>
-         </div>
-       </div>
-    </main>
+                        }
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
 
 </body>
 
