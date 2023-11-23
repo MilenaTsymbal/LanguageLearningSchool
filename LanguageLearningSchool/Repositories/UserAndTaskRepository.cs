@@ -35,6 +35,11 @@ namespace LanguageLearningSchool.Repositories
             return _context.UsersAndTasks.FirstOrDefault(c => c.UserAndTaskId == id);
         }
 
+        public List<UserAndTask> GetAllUsersOnTask(int taskId)
+        {
+            return _context.UsersAndTasks.Where(a => a.TaskId == taskId).ToList();
+        }
+
         public bool AddRange(List<UserAndTask> userAndTask)
         {
             _context.Set<UserAndTask>().AddRange(userAndTask);

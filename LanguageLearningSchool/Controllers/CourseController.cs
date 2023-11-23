@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Security.Claims;
 using QuestPDF;
 using LanguageLearningSchool.Repositories;
+using LanguageLearningSchool.Enums;
 
 namespace LanguageLearningSchool.Controllers
 {
@@ -62,6 +63,7 @@ namespace LanguageLearningSchool.Controllers
                     Courses = courses,
                     UserAndCourses = userAndCourses,
                     UserCreatorsOfCourses = usersCreatorOfCourses
+
                 };
                 return View(coursesInfo);
             }
@@ -88,6 +90,64 @@ namespace LanguageLearningSchool.Controllers
                 if (filters.DifficultyLevelFilter != null)
                 {
                     courses = courses.Where(c => c.DifficultyLevel == filters.DifficultyLevelFilter).ToList();
+                }
+
+                if (filters.AllLangugesBut != null)
+                {
+                    courses = courses.Where(c => c.Language != filters.AllLangugesBut).ToList();
+                }
+
+                if (filters.AllDifficultyLevelsBut != null)
+                {
+                    courses = courses.Where(c => c.DifficultyLevel != filters.AllDifficultyLevelsBut).ToList();
+                }
+
+                if (!string.IsNullOrEmpty(filters.UserIsRegistered))
+                {
+                    if (filters.UserIsRegistered.ToLower() == "true")
+                    {
+                        courses = _courseRepository
+                            .GetAll()
+                            .Where(course => _userAndCourseRepository
+                                .GetAll()
+                                .Any(item => item.UserId == user.Id && item.CourseId == course.CourseId))
+                            .ToList();
+                    }
+                    else if (filters.UserIsRegistered.ToLower() == "false")
+                    {
+                        courses = _courseRepository
+                            .GetAll()
+                            .Where(course => !_userAndCourseRepository
+                                .GetAll()
+                                .Any(item => item.UserId == user.Id && item.CourseId == course.CourseId))
+                            .ToList();
+                    }
+                }
+
+                if (filters.FromYear != null)
+                {
+                    DateTime fromYear = new DateTime(filters.FromYear.Value, 1, 1);
+
+                    var sortedUsersCreatorOfCourses = _userAndCourseRepository
+                        .GetAll()
+                        .Where(uc => uc.DateOfCreation != null && uc.DateOfCreation >= fromYear)
+                        .ToList();
+
+                    var sortedCourseIds = sortedUsersCreatorOfCourses.Select(uc => uc.CourseId).ToList();
+                    courses = courses.Where(c => sortedCourseIds.Contains(c.CourseId)).ToList();
+                }
+
+                if (filters.ToYear != null)
+                {
+                    DateTime toYear = new DateTime(filters.ToYear.Value, 12, 31);
+
+                    var sortedUsersCreatorOfCourses = _userAndCourseRepository
+                        .GetAll()
+                        .Where(uc => uc.DateOfCreation != null && uc.DateOfCreation <= toYear)
+                        .ToList();
+
+                    var sortedCourseIds = sortedUsersCreatorOfCourses.Select(uc => uc.CourseId).ToList();
+                    courses = courses.Where(c => sortedCourseIds.Contains(c.CourseId)).ToList();
                 }
 
                 if (!string.IsNullOrEmpty(filters.AlphabeticalOrder))
@@ -120,16 +180,8 @@ namespace LanguageLearningSchool.Controllers
                            .ToList();
                     }
 
-                    var sortedCourses = new List<Course>();
-                    foreach (var userCourse in sortedUsersCreatorOfCourses)
-                    {
-                        var course = _courseRepository.GetById(userCourse.CourseId);
-                        if (course != null)
-                        {
-                            sortedCourses.Add(course);
-                        }
-                    }
-                    courses = sortedCourses;
+                    var sortedCourseIds = sortedUsersCreatorOfCourses.Select(uc => uc.CourseId).ToList();
+                    courses = courses.OrderBy(c => sortedCourseIds.IndexOf(c.CourseId)).ToList();
                 }
 
                 if (!string.IsNullOrEmpty(filters.SearchQuery))
@@ -145,6 +197,8 @@ namespace LanguageLearningSchool.Controllers
                 filters.UserCreatorsOfCourses = usersCreatorOfCourses;
                 filters.LanguageFilter = filters.LanguageFilter;
                 filters.DifficultyLevelFilter = filters.DifficultyLevelFilter;
+                filters.AllLangugesBut = filters.AllLangugesBut;
+                filters.AllDifficultyLevelsBut = filters.AllDifficultyLevelsBut;
                 filters.AlphabeticalOrder = filters.AlphabeticalOrder;
                 filters.DateOfCreationOrder = filters.DateOfCreationOrder;
                 filters.SearchQuery = filters.SearchQuery;
@@ -356,107 +410,6 @@ namespace LanguageLearningSchool.Controllers
             return RedirectToAction("Detail", new { id = courseId });
         }
 
-        
-        //[HttpPost]
-        //public IActionResult GenerateCoursesDataReport(int courseId)
-        //{
-        //    List<Course> courses = _courseRepository.GetAll();
-
-        //    Document.Create(container =>
-        //    {
-        //        container.Page(page =>
-        //        {
-        //            page.Size(PageSizes.A4);
-        //            page.Header().Text($"Course report");
-
-        //            foreach (var course in courses)
-        //            {
-        //                var lessonsForCourse = _lessonRepository.GetAll().Where(lesson => lesson.CourseId == course.CourseId).ToList();
-        //                var lessonsForCourseCount = lessonsForCourse.Count;
-        //                var c = _lessonTaskRepository
-        //                    .GetAll()
-        //                    .Where(task => lessonsForCourse
-        //                        .Select(lesson => lesson.LessonId).Contains(task.LessonId))
-        //                    .ToList().Count;
-        //                var usersAndCourse = _userAndCourseRepository.GetAll().Where(item => item.CourseId == course.CourseId).ToList().Count;
-
-        //                page.Content()
-        //                .Text($"Course name: \n{course.CourseName}\n " +
-        //                $"Description of course: \n{course.Description}\n" +
-        //                $"Number of lessons on course:\n {lessonsForCourse}\n" +
-        //                $"Number of task on course: \n{lessonsForCourse}\n" +
-        //                $"Number of registered users on course: {usersAndCourse}\n");
-        //            }
-        //        });
-        //    }).ShowInPreviewer();
-
-            
-        //    return View("Index");
-        //}
-
-        //[HttpPost]
-        //public IActionResult GenerateCourseReport(int courseId)
-        //{
-        //    Course course = _courseRepository.GetById(courseId);
-
-        //    var lessonsForCourse = _lessonRepository.GetAll().Where(lesson => lesson.CourseId == courseId).ToList();
-        //    var tasksForCourse = _lessonTaskRepository
-        //        .GetAll()
-        //        .Where(task => lessonsForCourse
-        //            .Select(lesson => lesson.LessonId).Contains(task.LessonId))
-        //        .ToList();
-
-        //    var userAndTasksForCourse = _userAndTaskRepository
-        //        .GetAll()
-        //        .Where(userAndTask => tasksForCourse.Select(task => task.TaskId).Contains(userAndTask.TaskId))
-        //        .ToList();
-
-        //    var userAndLessonsForCourse = _userAndLessonRepository
-        //        .GetAll()
-        //        .Where(userAndLesson => lessonsForCourse.Select(lesson => lesson.LessonId).Contains(userAndLesson.LessonId))
-        //        .ToList();
-
-        //    var usersAndCourse = _userAndCourseRepository.GetAll().Where(item => item.CourseId == courseId).ToList();
-
-        //    Document.Create(container =>
-        //    {
-        //        container.Page(page =>
-        //        {
-        //            page.Size(PageSizes.A4);
-        //            page.Header().Text($"{course.CourseName} course report");
-
-        //            foreach (var userAndCourse in usersAndCourse)
-        //            {
-        //                var user = _userRepository.GetById(userAndCourse.UserId);
-        //                var generalestimation = userAndCourse.GeneralEstimation;
-        //                var userAndLessons = userAndLessonsForCourse.Where(ul => ul.UserId == userAndCourse.UserId).ToList();
-        //                var completedLessonsCount = userAndLessons.Count();
-        //                var totalLessonsCount = lessonsForCourse.Count();
-
-        //                var userAverageGrade = 0;
-        //                if (userAndTasksForCourse.Count() != 0)
-        //                {
-        //                    var totalScore = userAndTasksForCourse.Sum(ut => ut.UserAnswer == false ? 0 : 1);
-        //                    userAverageGrade = totalScore / userAndTasksForCourse.Count();
-        //                }
-
-        //                var progress = completedLessonsCount / totalLessonsCount;
-        //                if (user.UserRole == Enums.Roles.Student && userAndCourse.EndDate != null)
-        //                {
-        //                    page.Content()
-        //                    .Text($"{user.Name} {user.MiddleName} {user.Surname}\n" +
-        //                    $"General course estimation: {generalestimation}\n" +
-        //                    $"Lessons completed: {completedLessonsCount} out of {totalLessonsCount}\n" +
-        //                    $"Average lesson grade: {userAverageGrade}\n" +
-        //                    $"Progress: {(progress * 100).ToString("F2")}%");
-        //                }
-        //            }
-        //        });
-        //    }).GeneratePdf();
-
-        //    return RedirectToAction("Index");
-        //}
-        
         public IActionResult GenerateCourseReport(int courseId)
         {
             Course course = _courseRepository.GetById(courseId);
@@ -480,6 +433,7 @@ namespace LanguageLearningSchool.Controllers
 
             var usersAndCourse = _userAndCourseRepository.GetAll().Where(item => item.CourseId == courseId).ToList();
 
+            var dateOfCreation = DateTime.Now;
 
             var doc = Document.Create(container => container.Page(page =>
             {
@@ -490,7 +444,7 @@ namespace LanguageLearningSchool.Controllers
                 page.Content().Padding(50).Column(column =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Header().Text($"{course.CourseName} course report");
+                    page.Header().Text($"{course.CourseName} course report\nDate of creation:{dateOfCreation}");
 
                     foreach (var userAndCourse in usersAndCourse)
                     {
@@ -500,22 +454,12 @@ namespace LanguageLearningSchool.Controllers
                         var completedLessonsCount = userAndLessons.Count();
                         var totalLessonsCount = lessonsForCourse.Count();
 
-                        var userAverageGrade = 0;
-                        if (userAndTasksForCourse.Count() != 0)
-                        {
-                            var totalScore = userAndTasksForCourse.Sum(ut => ut.UserAnswer == false ? 0 : 1);
-                            userAverageGrade = totalScore / userAndTasksForCourse.Count();
-                        }
-
-                        var progress = completedLessonsCount / totalLessonsCount;
                         if (user.UserRole == Enums.Roles.Student && userAndCourse.EndDate != null)
                         {
 
                             column.Item().Text($"{user.Name} {user.MiddleName} {user.Surname}\n" +
                             $"General course estimation: {generalestimation}\n" +
                             $"Lessons completed: {completedLessonsCount} out of {totalLessonsCount}\n"
-                            //$"Average lesson grade: {userAverageGrade}\n" +
-                            //$"Progress: {(progress * 100).ToString("F2")}%"
                             );
                         }
                     }
@@ -535,6 +479,7 @@ namespace LanguageLearningSchool.Controllers
         public IActionResult GenerateCoursesDataReport()
         {
             List<Course> courses = _courseRepository.GetAll();
+            var dateOfCreation = DateTime.Now;
 
             var doc = Document.Create(container => container.Page(page =>
             {
@@ -545,7 +490,7 @@ namespace LanguageLearningSchool.Controllers
                 page.Content().Padding(50).Column(column =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Header().Text($"Courses report");
+                    page.Header().Text($"Courses report\nDate of creation:{dateOfCreation}");
 
                     foreach (var course in courses)
                     {

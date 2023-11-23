@@ -193,8 +193,10 @@ namespace LanguageLearningSchool.Controllers
             if (task == null) return View("Error");
 
             var answers = _answerRepository.GetAllAnswersOfTask(taskId);
-
             _answerRepository.DeleteRange(answers);
+
+            var userAndTask = _userAndTaskRepository.GetAllUsersOnTask(taskId);
+            _userAndTaskRepository.DeleteRange(userAndTask);
 
             _lessonTaskRepository.Delete(task);
 

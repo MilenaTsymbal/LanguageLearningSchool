@@ -44,13 +44,33 @@
                         <button type="submit" class="btn btn-outline-secondary">Search</button>
                     </div>
                     <p style="margin-bottom: 10px;">Filter By:</p>
+
                     <div class="filter-group">
-                        <select asp-for="LanguageFilter" id="languageFilter" class="form-select" style="margin-bottom: 10px;">
+                        <select asp-for="UserIsRegistered" id="difficultyFilter" class="form-select" style="margin-bottom: 10px;">
+                            <option value="">--Registration--</option>
+                                <option value="true">I'm registered for</option>
+                                <option value="false">I'm not registered for</option>
+                        </select>       
+                    </div>
+
+                    <div class="filter-group">
+                        <select asp-for="LanguageFilter"id="languageFilter" class="form-select" style="margin-bottom: 10px;">
                             <option value="">--All Languages--</option>
                             @foreach (var languageValue in Enum.GetValues(typeof(Languages)))
                             {
                                 var languageName = Enum.GetName(typeof(Languages), languageValue);
-                                <option value="@languageValue">@languageName</option>
+                                    <option value="@languageValue">@languageName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select asp-for="AllLangugesBut"id="languageFilter" class="form-select" style="margin-bottom: 10px;">
+                            <option value="">--All Languages But--</option>
+                            @foreach (var languageValue in Enum.GetValues(typeof(Languages)))
+                            {
+                                var languageName = Enum.GetName(typeof(Languages), languageValue);
+                                    <option value="@languageValue">@languageName</option>
                             }
                         </select>
                     </div>
@@ -61,10 +81,34 @@
                             @foreach (var difficultyValue in Enum.GetValues(typeof(DifficultyLevels)))
                             {
                                 var difficultyName = Enum.GetName(typeof(DifficultyLevels), difficultyValue);
-                                <option value="@difficultyValue">@difficultyName</option>
+                                    <option value="@difficultyValue">@difficultyName</option>
                             }
                         </select>       
                     </div>
+
+                    <div class="filter-group">
+                        <select asp-for="AllDifficultyLevelsBut" id="difficultyFilter" class="form-select" style="margin-bottom: 10px;">
+                            <option value="">--All Difficulties But--</option>
+                            @foreach (var difficultyValue in Enum.GetValues(typeof(DifficultyLevels)))
+                            {
+                                var difficultyName = Enum.GetName(typeof(DifficultyLevels), difficultyValue);
+                                    <option value="@difficultyValue">@difficultyName</option>
+                            }
+                        </select>       
+                    </div>
+
+                    <div class="d-flex flex-column mb-4">
+                        <label>Filter courses by year</label>
+                        <div class="d-flex">
+                            <div class="col-5" style="margin-right: 10px;">
+                                <input asp-for="FromYear" class="form-control" placeholder="From year"/>
+                            </div>
+                            <div class="col-5">
+                                <input asp-for="ToYear" class="form-control" placeholder="To year"/>
+                            </div>
+                        </div>
+                    </div>
+
                     <p style="margin-bottom: 10px;">Sort By:</p>
                     <div class="filter-group">
                         <select asp-for="AlphabeticalOrder" style="margin-bottom: 10px;" id="sortOrder" class="form-select">
